@@ -1,9 +1,9 @@
-package com.huchihaitachi.remoteapi
+package com.huchihaitachi.remoteapi.service
 
 import io.reactivex.Completable
 import retrofit2.http.*
 
-interface AnimeAPI {
+interface AnimeAuthAPI {
 
     @Headers("Content-Type: application/json", "Accept: application/json")
     @FormUrlEncoded

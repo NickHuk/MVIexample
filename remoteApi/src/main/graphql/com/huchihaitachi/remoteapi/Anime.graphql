@@ -1,0 +1,25 @@
+query Page($page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+            hasNextPage
+        }
+        media {
+            id
+            title {
+                english
+            }
+            type
+            description(asHtml: false)
+            trailer {
+                id
+                thumbnail
+            }
+            episodes
+            duration
+        }
+    }
+}

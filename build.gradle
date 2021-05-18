@@ -4,8 +4,11 @@ buildscript {
     ext.conductor_version = '3.0.0'
     ext.dagger_version = '2.35.1'
     ext.rx_java_version = '2.2.21'
-    ext.rx_android_version = '2.1.1.'
+    ext.rx_android_version = '2.1.1'
     ext.retrofit_version = '2.9.0'
+    ext.okhttp_version = '4.9.1'
+    ext.gson_version = '2.9.0'
+    ext.apollo_version = '2.5.6'
     ext.navigation_version = '2.3.5'
     repositories {
         google()
@@ -17,6 +20,7 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        classpath "com.apollographql.apollo:apollo-gradle-plugin:$apollo_version"
     }
 }
 
