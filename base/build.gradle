@@ -45,6 +45,11 @@ dependencies {
     //rxJava 2
     implementation "io.reactivex.rxjava2:rxjava:$rx_java_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
+    //conductor
+    implementation "com.bluelinelabs:conductor:$conductor_version"
+    implementation "com.bluelinelabs:conductor-rxlifecycle2:$conductor_version"
+    implementation "com.bluelinelabs:conductor-autodispose:$conductor_version"
+    implementation "com.bluelinelabs:conductor-archlifecycle:$conductor_version"
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

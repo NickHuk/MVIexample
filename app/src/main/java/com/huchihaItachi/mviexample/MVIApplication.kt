@@ -3,8 +3,12 @@ package com.huchihaItachi.mviexample
 import android.app.Application
 import com.huchihaItachi.mviexample.di.component.ApplicationComponent
 import com.huchihaItachi.mviexample.di.component.DaggerApplicationComponent
+import com.huchihaitachi.login.di.LoginSubcomponent
+import com.huchihaitachi.login.di.LoginSubcomponentProvider
 
-class MVIApplication : Application() {
+class MVIApplication : Application(),
+        LoginSubcomponentProvider
+{
     val applicationComponent: ApplicationComponent by lazy {
         DaggerApplicationComponent.factory().create(applicationContext)
     }
@@ -13,4 +17,7 @@ class MVIApplication : Application() {
         super.onCreate()
         applicationComponent.inject(this)
     }
+
+    override fun provideLoginSubcomponent(): LoginSubcomponent =
+        applicationComponent.loginSubcomponent().create()
 }

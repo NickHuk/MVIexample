@@ -16,6 +16,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "AUTH_REDIRECT_URL", '"https://anilist.co/api/v2/oauth/authorize?client_id=5574&redirect_uri=https://huchihaitatchi.mviexample.com&response_type=code"'
     }
 
     buildTypes {
@@ -60,4 +61,5 @@ dependencies {
     implementation project (':repository')
     implementation project (':usecase')
     implementation project (':remoteApi')
+    implementation project (':login')
 }
