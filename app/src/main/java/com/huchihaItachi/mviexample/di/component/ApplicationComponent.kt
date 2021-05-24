@@ -2,25 +2,31 @@ package com.huchihaItachi.mviexample.di.component
 
 import android.content.Context
 import com.huchihaItachi.mviexample.MVIApplication
-import com.huchihaitachi.login.di.LoginSubcomponent
+import com.huchihaItachi.mviexample.di.module.ApplicationModule
+import com.huchihaItachi.mviexample.di.module.DataSourceModule
+import com.huchihaItachi.mviexample.di.module.RepositoryModule
+import com.huchihaItachi.mviexample.di.module.UseCaseModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
 @Component(
-    modules = [
-
-    ]
+  modules = [
+    ApplicationModule::class,
+    DataSourceModule::class,
+    RepositoryModule::class,
+    UseCaseModule::class
+  ]
 )
 interface ApplicationComponent {
 
-    @Component.Factory
-    interface Factory {
-        fun create(@BindsInstance context: Context): ApplicationComponent
-    }
+  @Component.Factory
+  interface Factory {
+    fun create(@BindsInstance context: Context): ApplicationComponent
+  }
 
-    fun loginSubcomponent(): LoginSubcomponent.Factory
+  fun activitySubcomponent(): ActivitySubcomponent.Factory
 
-    fun inject(application: MVIApplication)
+  fun inject(application: MVIApplication)
 }

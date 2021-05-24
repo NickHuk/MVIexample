@@ -1,4 +1,4 @@
-package com.huchihaitachi.login.di
+package com.huchihaitachi.login.di.module
 
 import dagger.Module
 

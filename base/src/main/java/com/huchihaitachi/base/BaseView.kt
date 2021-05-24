@@ -1,6 +1,6 @@
 package com.huchihaitachi.base
 
-interface BaseView<in S: BaseViewState> {
+interface BaseView<in S : BaseViewState> {
 
-    fun render(state: S)
+  fun render(state: S)
 }

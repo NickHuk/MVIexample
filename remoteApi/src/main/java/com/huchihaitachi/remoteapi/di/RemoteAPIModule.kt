@@ -10,18 +10,17 @@ import javax.inject.Singleton
 @Module
 interface RemoteAPIModule {
 
-    companion object {
-        @Singleton
-        @Provides
-        fun provideRetrofit(): Retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.ANIMELIST_AUTH_URL)
-            .build()
+  companion object {
+    @Singleton
+    @Provides
+    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+      .baseUrl(BuildConfig.ANIMELIST_AUTH_URL)
+      .build()
 
-        @Singleton
-        @Provides
-        fun provideApolloClient(): ApolloClient = ApolloClient.builder()
-            .serverUrl(BuildConfig.ANIMELIST_GRAPH_URL)
-            .build()
-
-    }
+    @Singleton
+    @Provides
+    fun provideApolloClient(): ApolloClient = ApolloClient.builder()
+      .serverUrl(BuildConfig.ANIMELIST_GRAPH_URL)
+      .build()
+  }
 }

@@ -1,8 +1,8 @@
 package com.huchihaitachi.usecase
 
-import io.reactivex.Observable
+import io.reactivex.Completable
 
 interface LoginUseCase {
 
-    operator fun invoke(): Observable<Unit>
+  operator fun invoke(code: String): Completable
 }
