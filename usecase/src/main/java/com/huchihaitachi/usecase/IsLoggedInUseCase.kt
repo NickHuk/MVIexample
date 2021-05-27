@@ -4,5 +4,5 @@ import io.reactivex.Single
 
 interface IsLoggedInUseCase {
 
-  operator fun invoke(): Single<Boolean>
+    operator fun invoke(): Single<Boolean>
 }

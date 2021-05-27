@@ -9,7 +9,9 @@ import com.huchihaItachi.mviexample.di.ActivitySubcomponentProvider
 import com.huchihaItachi.mviexample.di.component.ActivitySubcomponent
 import com.huchihaItachi.mviexample.navigation.Navigator
 import com.huchihaItachi.mviexample.navigation.RootFlowCoordinator
-import com.huchihaitachi.login.LoginController
+import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
+import com.huchihaitachi.anilist.di.component.AnilistSubcomponent
+import com.huchihaitachi.login.presentation.LoginController
 import com.huchihaitachi.login.di.LoginSubcomponentProvider
 import com.huchihaitachi.login.di.component.LoginSubcomponent
 import com.huchihaitachi.loginwebview.di.LoginWebSubcomponentProvider
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(),
   LoginSubcomponentProvider,
-  LoginWebSubcomponentProvider {
+  LoginWebSubcomponentProvider,
+  AnilistSubcomponentProvider {
   @Inject lateinit var rootFlowCoordinator: RootFlowCoordinator
   @Inject lateinit var navigator: Navigator
   private lateinit var activitySubcomponent: ActivitySubcomponent
@@ -40,4 +43,7 @@ class MainActivity : AppCompatActivity(),
 
   override fun provideLoginWebSubcomponent(): LoginWebSubcomponent =
     activitySubcomponent.loginWebSubcomponent().create()
+
+  override fun provideAnilistSubcomponent(): AnilistSubcomponent =
+    activitySubcomponent.anilistSubcomponent().create()
 }

@@ -1,4 +1,4 @@
-package com.huchihaitachi.loginwebview
+package com.huchihaitachi.loginwebview.presentation
 
 import com.huchihaitachi.base.BaseViewState
 

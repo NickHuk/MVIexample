@@ -54,15 +54,18 @@ dependencies {
   implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
   //retrofit
   implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-  implementation "com.squareup.retrofit2:adapter-rxjava:$retrofit_version"
+  implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
   //okHttp
   implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+  implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
   //gson
   implementation "com.squareup.retrofit2:converter-gson:$gson_version"
   //apollo
   implementation "com.apollographql.apollo:apollo-runtime:$apollo_version"
   implementation "com.apollographql.apollo:apollo-rx2-support:$apollo_version"
   implementation "com.apollographql.apollo:apollo-android-support:$apollo_version"
+  //timber
+  implementation "com.jakewharton.timber:timber:$timber_version"
 
   testImplementation 'junit:junit:4.+'
   androidTestImplementation 'androidx.test.ext:junit:1.1.2'

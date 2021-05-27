@@ -1,10 +1,11 @@
-package com.huchihaitachi.loginwebview
+package com.huchihaitachi.loginwebview.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.Controller
+import com.huchihaitachi.loginwebview.BuildConfig
 import com.huchihaitachi.loginwebview.databinding.ControllerWebLoginBinding
 import com.huchihaitachi.loginwebview.di.LoginWebSubcomponentProvider
 import io.reactivex.Observable
@@ -12,6 +13,7 @@ import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 class LoginWebController() : Controller(), LoginWebView {
+  @Inject lateinit var presenter: LoginWebPresenter
   @Inject lateinit var loginWebClient: LoginWebClient
   private var _binding: ControllerWebLoginBinding? = null
   private val binding: ControllerWebLoginBinding
@@ -28,6 +30,8 @@ class LoginWebController() : Controller(), LoginWebView {
   ): View {
     (activity as LoginWebSubcomponentProvider).provideLoginWebSubcomponent()
       .inject(this)
+    presenter.bind(this)
+    presenter.bindIntents()
     loginWebClient.onLoggedIn = { code ->
       _loginCodeIntent.onNext(code)
       _loginCodeIntent.onComplete()
@@ -43,12 +47,9 @@ class LoginWebController() : Controller(), LoginWebView {
     return binding.root
   }
 
-  override fun onAttach(view: View) {
-    super.onAttach(view)
-  }
-
   override fun onDestroyView(view: View) {
     _binding = null
+    presenter.unbind()
     super.onDestroyView(view)
   }
 

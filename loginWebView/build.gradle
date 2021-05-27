@@ -22,7 +22,7 @@ android {
     consumerProguardFiles "consumer-rules.pro"
     buildConfigField "String", "AUTH_REDIRECT_URL",
         '"https://anilist.co/api/v2/oauth/authorize?client_id=5574&redirect_uri=https://huchihaitatchi.mviexample.com&response_type=code"'
-    buildConfigField "String", "REDIRECT_HOST", '"https://huchihaitatchi.mviexample.com"'
+    buildConfigField "String", "REDIRECT_HOST", '"huchihaitatchi.mviexample.com"'
   }
 
   buildTypes {

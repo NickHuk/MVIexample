@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="height_anime_card">104dp</dimen>
+  <dimen name="padding_anime_card">4dp</dimen>
+  <dimen name="height_thumbnail">96dp</dimen>
+  <dimen name="width_thumbnail">72dp</dimen>
+  <dimen name="height_page_loading_pb">24dp</dimen>
+</resources>

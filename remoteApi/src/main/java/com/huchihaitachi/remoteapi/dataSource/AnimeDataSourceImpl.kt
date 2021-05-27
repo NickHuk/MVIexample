@@ -18,9 +18,9 @@ class AnimeDataSourceImpl @Inject constructor(
   private val animeAuthService: AnimeAuthService
 ) : AnimeDataSource {
 
-  fun loadAnimePage(
+  override fun loadAnimePage(
     page: Int,
-    perPage: Int = 15
+    perPage: Int
   ): Single<Page> =
     Rx2Apollo.from(
       apolloClient.query(
@@ -37,11 +37,11 @@ class AnimeDataSourceImpl @Inject constructor(
           response.data?.page?.pageInfo?.hasNextPage,
           response.data?.page?.media?.map { anime ->
             Anime(
-              anime?.id,
+              anime?.id ?: 0,
               anime?.title?.english,
               anime?.type?.toDomain(),
               anime?.description,
-              anime?.trailer?.thumbnail,
+              anime?.coverImage?.large,
               anime?.episodes,
               anime?.duration
             )

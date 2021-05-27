@@ -1,4 +1,4 @@
-package com.huchihaitachi.login
+package com.huchihaitachi.login.presentation
 
 import com.huchihaitachi.base.BaseView
 import io.reactivex.Observable

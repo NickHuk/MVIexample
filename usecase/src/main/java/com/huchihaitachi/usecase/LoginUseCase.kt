@@ -4,5 +4,5 @@ import io.reactivex.Completable
 
 interface LoginUseCase {
 
-  operator fun invoke(code: String): Completable
+    operator fun invoke(code: String): Completable
 }

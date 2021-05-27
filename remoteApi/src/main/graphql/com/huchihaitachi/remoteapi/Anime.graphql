@@ -14,9 +14,8 @@ query Page($page: Int, $perPage: Int) {
             }
             type
             description(asHtml: false)
-            trailer {
-                id
-                thumbnail
+            coverImage {
+                large
             }
             episodes
             duration

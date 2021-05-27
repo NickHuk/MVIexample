@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.huchihaitachi.datasource.UserDataSource
 import com.huchihaitachi.remoteapi.service.AnimeAuthService
+import com.huchihaitachi.remoteapi.service.Credentials
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -17,7 +18,7 @@ class UserDataSourceImpl @Inject constructor(
     Single.just(preferences.contains(AUTH_TOKEN))
 
   override fun exchangeCodeToToken(code: String): Single<String> =
-    animeAuthService.codeToTokenExchange(code).map { response ->
+    animeAuthService.codeToTokenExchange(Credentials(code)).map { response ->
       response.accessToken
     }
 

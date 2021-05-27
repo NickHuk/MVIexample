@@ -5,6 +5,7 @@ import com.huchihaItachi.mviexample.di.ActivitySubcomponentProvider
 import com.huchihaItachi.mviexample.di.component.ActivitySubcomponent
 import com.huchihaItachi.mviexample.di.component.ApplicationComponent
 import com.huchihaItachi.mviexample.di.component.DaggerApplicationComponent
+import timber.log.Timber
 
 class MVIApplication : Application(),
   ActivitySubcomponentProvider {
@@ -14,6 +15,9 @@ class MVIApplication : Application(),
 
   override fun onCreate() {
     super.onCreate()
+    if(BuildConfig.DEBUG) {
+      Timber.plant(Timber.DebugTree())
+    }
     applicationComponent.inject(this)
   }
 

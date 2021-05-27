@@ -55,10 +55,20 @@ dependencies {
   //rxJava 2
   implementation "io.reactivex.rxjava2:rxjava:$rx_java_version"
   implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
-  //navigation component
-  implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
-  implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
-  implementation "androidx.navigation:navigation-dynamic-features-fragment:$navigation_version"
+  //apollo
+  implementation "com.apollographql.apollo:apollo-runtime:$apollo_version"
+  implementation "com.apollographql.apollo:apollo-rx2-support:$apollo_version"
+  implementation "com.apollographql.apollo:apollo-android-support:$apollo_version"
+  //retrofit
+  implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+  implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+  //okHttp
+  implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+  implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+  //gson
+  implementation "com.squareup.retrofit2:converter-gson:$gson_version"
+  //timber
+  implementation "com.jakewharton.timber:timber:$timber_version"
   testImplementation 'junit:junit:4.+'
   androidTestImplementation 'androidx.test.ext:junit:1.1.2'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -71,4 +81,5 @@ dependencies {
   implementation project(':remoteApi')
   implementation project(':login')
   implementation project(':loginWebView')
+  implementation project(':anilist')
 }

@@ -1,14 +1,16 @@
-package com.huchihaitachi.loginwebview
+package com.huchihaitachi.loginwebview.presentation
 
 import android.net.Uri
 import android.net.http.SslError
 import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.huchihaitachi.loginwebview.BuildConfig
 import com.huchihaitachi.loginwebview.di.scope.LoginWebScope
+import javax.inject.Inject
 
 @LoginWebScope
-class LoginWebClient : WebViewClient() {
+class LoginWebClient @Inject constructor() : WebViewClient() {
   lateinit var onLoggedIn: (code: String) -> Unit
 
   override fun onReceivedSslError(
