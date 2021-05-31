@@ -5,4 +5,13 @@
   <dimen name="height_thumbnail">96dp</dimen>
   <dimen name="width_thumbnail">72dp</dimen>
   <dimen name="height_page_loading_pb">24dp</dimen>
+  <dimen name="width_details_cover">96dp</dimen>
+  <dimen name="height_details_cover">128dp</dimen>
+  <dimen name="height_details">512dp</dimen>
+  <dimen name="padding_details">16dp</dimen>
+  <dimen name="margin_start_details_card">0dp</dimen>
+  <dimen name="margin_top_details_card">18dp</dimen>
+  <dimen name="margin_end_details_card">0dp</dimen>
+  <dimen name="margin_bottom_details_card">32dp</dimen>
+  <dimen name="radius_details_card">12dp</dimen>
 </resources>

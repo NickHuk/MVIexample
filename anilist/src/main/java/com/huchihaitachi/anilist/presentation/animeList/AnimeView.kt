@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
 import com.airbnb.epoxy.ModelProp
@@ -34,4 +35,9 @@ class AnimeView @JvmOverloads constructor(
 
   @ModelProp
   fun setCover(url: String) = coverIv.setUrl(url)
+
+  @CallbackProp
+  fun onClickListener(onClickListener: OnClickListener?) {
+    setOnClickListener(onClickListener)
+  }
 }

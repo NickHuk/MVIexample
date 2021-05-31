@@ -3,11 +3,13 @@ package com.huchihaitachi.anilist.presentation
 import com.apollographql.apollo.exception.ApolloNetworkException
 import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.di.scope.AnilistScope
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.DETAILS
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.base.BasePresenter
 import com.huchihaitachi.domain.Anime
 import com.huchihaitachi.usecase.GetStringResourceUseCase
+import com.huchihaitachi.usecase.LoadAnimeUseCase
 import com.huchihaitachi.usecase.LoadPageUseCase
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,9 +19,10 @@ import javax.inject.Inject
 @AnilistScope
 class AnilistPresenter @Inject constructor(
   private val loadPageUseCase: LoadPageUseCase,
+  private val loadAnimeUseCase: LoadAnimeUseCase,
   private val getStringResourceUseCase: GetStringResourceUseCase
 ) : BasePresenter<AnilistView, AnilistViewState>(
-  AnilistViewState(false, PAGE, null, null, 0, null, true)
+  AnilistViewState(false, PAGE, null, null, null, 0, null, true)
 ) {
 
   init {
@@ -52,7 +55,36 @@ class AnilistPresenter @Inject constructor(
             || state.loadingType != RELOAD
         }
         .flatMap { unit -> loadPage(0) }
-      val intents = Observable.merge(loadPageIntent, reloadIntent)
+      //details
+      val detailsIntent = view.showDetails
+        //.filter { id -> state.details?.id == id }
+        .observeOn(Schedulers.io())
+        .switchMap { id ->
+          loadAnimeUseCase(id)
+            .toObservable()
+            .map { details ->
+              AnilistPartialState(
+                loadingType = DETAILS,
+                details = details
+              )
+            }
+            .startWith(
+              AnilistPartialState(
+                true,
+                DETAILS
+              )
+            )
+            .onErrorReturn { throwable ->
+              AnilistPartialState(
+                loadingType = DETAILS,
+                error = when (throwable) {
+                  is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
+                  else -> throwable.message
+                }
+              )
+            }
+        }
+      val intents = Observable.merge(loadPageIntent, reloadIntent, detailsIntent)
       intents.scan(state, ::animeStateReducer)
         .subscribe { s ->
           state = s
@@ -94,6 +126,7 @@ class AnilistPresenter @Inject constructor(
     previousState.copy(
       changes.isLoading,
       changes.loadingType,
+      changes.details,
       if (changes.loadingType == PAGE)
         mutableListOf<Anime>().apply {
           previousState.anime?.let(::addAll)
@@ -101,7 +134,7 @@ class AnilistPresenter @Inject constructor(
         }
       else
         changes.anime,
-      changes.total,
+      changes.total,//TODO: display correctly after opening details
       changes.currentPage,
       changes.lastPage,
       changes.hasNextPage,

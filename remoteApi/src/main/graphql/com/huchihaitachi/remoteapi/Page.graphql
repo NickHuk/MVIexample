@@ -10,15 +10,12 @@ query Page($page: Int, $perPage: Int) {
         media {
             id
             title {
+                romaji
                 english
             }
-            type
-            description(asHtml: false)
             coverImage {
-                large
+                extraLarge
             }
-            episodes
-            duration
         }
     }
 }

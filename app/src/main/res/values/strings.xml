@@ -1,3 +1,4 @@
 <resources>
   <string name="app_name">MVIExample</string>
+  <string name="title_details">Details</string>
 </resources>

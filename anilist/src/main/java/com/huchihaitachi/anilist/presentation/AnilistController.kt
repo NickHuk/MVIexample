@@ -7,13 +7,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bluelinelabs.conductor.Controller
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.card.MaterialCardView
+import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.databinding.ControllerAnilistBinding
 import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
+import com.huchihaitachi.base.domain.localized
+import com.huchihaitachi.base.domain.stringRes
+import com.huchihaitachi.base.setUrl
 import com.huchihaitachi.base.visible
 import com.huchihaitachi.domain.Anime
-import com.huchihaitachi.domain.Type
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
@@ -31,16 +36,29 @@ class AnilistController : Controller(), AnilistView {
   private val _reload: PublishSubject<Unit> = PublishSubject.create()
   override val reload: Observable<Unit>
     get() = _reload
+  private val _showDetails: PublishSubject<Int> = PublishSubject.create()
+  override val showDetails: Observable<Int>
+    get() = _showDetails
+  //TODO: handle user swipes bottom sheet down
+
+  private lateinit var bottomSheetBehavior: BottomSheetBehavior<MaterialCardView>
 
   override fun render(state: AnilistViewState) {
     state.anime?.let(animeEpoxyController::setData)
-    binding.pageLoadingPb.visible = state.isLoading && state.loadingType == PAGE
+    binding.animeListL.pageLoadingPb.visible = state.isLoading && state.loadingType == PAGE
     if(!state.isLoading) {
-      binding.animeSrl.isRefreshing = false
+      binding.animeListL.animeSrl.isRefreshing = false
     }
-    binding.errorFooterTv.apply {
+    binding.animeListL.errorFooterTv.apply {
       visible = state.error != null
       state.error?.let { text = it }
+    }
+    bottomSheetBehavior.state = if(state.details == null) {
+      BottomSheetBehavior.STATE_COLLAPSED
+    }
+    else {
+      bindDetailsData(state.details)
+      BottomSheetBehavior.STATE_EXPANDED
     }
   }
 
@@ -67,17 +85,20 @@ class AnilistController : Controller(), AnilistView {
   private fun setupViews() {
     setupRecyclerView()
     setupSwipeToRefresh()
+    setupBottomSheet()
   }
 
   private fun setupSwipeToRefresh() {
-    binding.animeSrl.setOnRefreshListener {
+    binding.animeListL.animeSrl.setOnRefreshListener {
       _reload.onNext(Unit)
     }
   }
 
   private fun setupRecyclerView() {
-    animeEpoxyController = AnimeEpoxyController()
-    binding.animeErv.apply {
+    animeEpoxyController = AnimeEpoxyController { details ->
+      _showDetails.onNext(details)
+    }
+    binding.animeListL.animeErv.apply {
       layoutManager = LinearLayoutManager(context)
       adapter = animeEpoxyController.adapter
       addOnScrollListener(
@@ -95,6 +116,56 @@ class AnilistController : Controller(), AnilistView {
           }
         }
       )
+    }
+  }
+
+  private fun setupBottomSheet() {
+    bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsL.root)
+    /*bottomSheetBehavior.addBottomSheetCallback(
+      object : BottomSheetCallback() {
+
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+          when(newState) {
+            BottomSheetBehavior.STATE_EXPANDED -> {
+              bottomSheetBehavior.setPeekHeight(600)
+            }
+          }
+        }
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {
+        }
+      }
+    )*/
+  }
+
+  private fun bindDetailsData(details: Anime) {
+    binding.detailsL.let { detailsBinding ->
+      details.coverImage?.let(detailsBinding.detailsCoverIv::setUrl)
+      details.title?.let { title ->
+        detailsBinding.titleTv.text = resources?.getString(
+          R.string.title,
+          title,
+          details.type?.stringRes?.let { resources?.getString(it) }
+        )
+      }
+      detailsBinding.beginningTv.text = resources?.getString(
+        R.string.beginning,
+        details.season?.localized(resources),
+        details.seasonYear
+      )
+      details.episodes?.let { episodes ->
+        detailsBinding.episodesTv.text = resources?.getString(R.string.num_episodes, episodes)
+      }
+      details.duration?.let { duration ->
+        (duration / 60).let { hours ->
+          detailsBinding.durationTv.text = if(hours == 0) {
+            resources?.getString(R.string.episode_duration_minutes, duration % 60)
+          } else {
+            resources?.getString(R.string.episode_duration_hours, hours, duration % 60)
+          }
+        }
+      }
+      details.description?.let { description -> detailsBinding.descriptionTv.text = details.description }
     }
   }
 

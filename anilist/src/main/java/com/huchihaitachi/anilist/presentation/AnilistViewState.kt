@@ -7,6 +7,7 @@ import com.huchihaitachi.domain.Anime
 data class AnilistViewState(
   val isLoading: Boolean = false,
   val loadingType: LoadingType = PAGE,
+  val details: Anime? = null,
   val anime: List<Anime>? = null,
   val total: Int? = null,
   val currentPage: Int? = null,
@@ -17,6 +18,7 @@ data class AnilistViewState(
 
   enum class LoadingType {
     PAGE,
-    RELOAD
+    RELOAD,
+    DETAILS
   }
 }

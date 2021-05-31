@@ -2,10 +2,13 @@ package com.huchihaitachi.domain
 
 data class Anime(
   val id: Int,
-  val title: String?,
-  val type: Type?,
-  val description: String?,
-  val coverImage: String?,
-  val numEpisodes: Int?,
-  val duration: Int? //minutes in general
+  val title: String? = null,
+  val type: Type? = null,
+  val description: String? = null,
+  val season: Season? = null,
+  val seasonYear: Int? = null,
+  val episodes: Int?  = null,
+  val duration: Int? = null, //minutes in general
+  val coverImage: String? = null,
+  val bannerImage: String? = null
 )
