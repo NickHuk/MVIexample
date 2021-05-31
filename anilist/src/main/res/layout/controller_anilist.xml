@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    >
+
+  <include
+      android:id="@+id/anime_list_l"
+      layout="@layout/anilist_main_content" />
+  <include
+      android:id="@+id/details_l"
+      layout="@layout/anime_details" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
