@@ -3,9 +3,10 @@ package com.huchihaitachi.anilist.presentation
 import com.apollographql.apollo.exception.ApolloNetworkException
 import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.di.scope.AnilistScope
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.DETAILS
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.NOT_LOADING
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
+import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.base.BasePresenter
 import com.huchihaitachi.domain.Anime
 import com.huchihaitachi.usecase.GetStringResourceUseCase
@@ -22,7 +23,7 @@ class AnilistPresenter @Inject constructor(
   private val loadAnimeUseCase: LoadAnimeUseCase,
   private val getStringResourceUseCase: GetStringResourceUseCase
 ) : BasePresenter<AnilistView, AnilistViewState>(
-  AnilistViewState(false, PAGE, null, null, null, 0, null, true)
+  AnilistViewState(NOT_LOADING, null, null, null)
 ) {
 
   init {
@@ -41,42 +42,26 @@ class AnilistPresenter @Inject constructor(
       // load page
       val loadPageIntent = view.loadAnimePage
         .observeOn(Schedulers.io())
-        .filter { _ ->
-          state.hasNextPage == true
-            && state.currentPage != null
-            && !state.isLoading
-        }
-        .flatMap { _ -> loadPage(state.currentPage!! + 1) }
+        .filter { _ -> state.pageState?.hasNextPage == true && state.loading != RELOAD && state.loading != PAGE }
+        .flatMap { _ -> loadPage(state.pageState?.currentPage!! + 1) }
       //reload
       val reloadIntent = view.reload
         .observeOn(Schedulers.io())
-        .filter { _ ->
-          !state.isLoading
-            || state.loadingType != RELOAD
-        }
+        .filter { _ -> state.loading != RELOAD }
         .flatMap { unit -> loadPage(0) }
       //details
       val detailsIntent = view.showDetails
-        //.filter { id -> state.details?.id == id }
         .observeOn(Schedulers.io())
         .switchMap { id ->
           loadAnimeUseCase(id)
             .toObservable()
             .map { details ->
               AnilistPartialState(
-                loadingType = DETAILS,
                 details = details
               )
             }
-            .startWith(
-              AnilistPartialState(
-                true,
-                DETAILS
-              )
-            )
             .onErrorReturn { throwable ->
               AnilistPartialState(
-                loadingType = DETAILS,
                 error = when (throwable) {
                   is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
                   else -> throwable.message
@@ -84,7 +69,12 @@ class AnilistPresenter @Inject constructor(
               )
             }
         }
-      val intents = Observable.merge(loadPageIntent, reloadIntent, detailsIntent)
+      val hideDetailsIntent = view.hideDetails
+        .filter { state.loading == NOT_LOADING }
+        .map {
+          AnilistPartialState()
+        }
+      val intents = Observable.merge(loadPageIntent, reloadIntent, detailsIntent, hideDetailsIntent)
       intents.scan(state, ::animeStateReducer)
         .subscribe { s ->
           state = s
@@ -98,23 +88,16 @@ class AnilistPresenter @Inject constructor(
       .toObservable()
       .map { page ->
         AnilistPartialState(
-          loadingType = if (pageNum == 0) RELOAD else PAGE,
-          anime = page.anime,
-          total = page.total,
-          currentPage = page.currentPage,
-          lastPage = page.lastPage,
-          hasNextPage = page.hasNextPage
+          pageState = PageState(page.anime, page.currentPage, page.hasNextPage)
         )
       }
       .startWith(
         AnilistPartialState(
-          isLoading = true,
-          loadingType = if (pageNum == 0) RELOAD else PAGE
+          loading = if(pageNum == 0) RELOAD else PAGE
         )
       )
       .onErrorReturn { throwable ->
         AnilistPartialState(
-          loadingType = if (pageNum == 0) RELOAD else PAGE,
           error = when(throwable) {
             is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
             else -> throwable.message
@@ -124,20 +107,20 @@ class AnilistPresenter @Inject constructor(
 
   private fun animeStateReducer(previousState: AnilistViewState, changes: AnilistPartialState) =
     previousState.copy(
-      changes.isLoading,
-      changes.loadingType,
+      changes.loading,
       changes.details,
-      if (changes.loadingType == PAGE)
-        mutableListOf<Anime>().apply {
-          previousState.anime?.let(::addAll)
-          changes.anime?.let(::addAll)
-        }
-      else
-        changes.anime,
-      changes.total,//TODO: display correctly after opening details
-      changes.currentPage,
-      changes.lastPage,
-      changes.hasNextPage,
+      when (previousState.loading) {
+        PAGE -> changes.pageState?.copy(
+          mutableListOf<Anime>().apply {
+            previousState.pageState?.anime?.let(::addAll)
+            changes.pageState.anime?.let(::addAll)
+          }
+        )
+        RELOAD ->
+          changes.pageState?.copy()
+        NOT_LOADING ->
+          previousState.pageState?.copy()
+      },
       changes.error
     )
 

@@ -11,7 +11,7 @@
       android:id="@+id/anime_srl"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      app:layout_constraintBottom_toTopOf="@id/page_loading_pb"
+      app:layout_constraintBottom_toTopOf="@id/total_footer_tv"
       app:layout_constraintTop_toTopOf="parent"
       >
 
@@ -19,11 +19,18 @@
         android:id="@+id/anime_erv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/page_loading_pb"
-        app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_anime"
         />
   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+  <TextView
+      android:id="@+id/total_footer_tv"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/height_page_loading_pb"
+      android:gravity="center_horizontal"
+      app:layout_constraintBottom_toTopOf="@id/page_loading_pb"
+      />
+
 
   <ProgressBar
       android:id="@+id/page_loading_pb"

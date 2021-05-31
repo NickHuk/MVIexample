@@ -31,7 +31,6 @@ class AnimeDataSourceImpl @Inject constructor(
       .singleOrError()
       .map { response ->
         Page(
-          response.data?.page?.pageInfo?.total,
           response.data?.page?.pageInfo?.perPage,
           response.data?.page?.pageInfo?.currentPage,
           response.data?.page?.pageInfo?.lastPage,

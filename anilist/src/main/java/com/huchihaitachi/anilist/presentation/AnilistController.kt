@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bluelinelabs.conductor.Controller
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.card.MaterialCardView
 import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.databinding.ControllerAnilistBinding
 import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
+
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
 import com.huchihaitachi.base.domain.localized
 import com.huchihaitachi.base.domain.stringRes
@@ -39,16 +42,18 @@ class AnilistController : Controller(), AnilistView {
   private val _showDetails: PublishSubject<Int> = PublishSubject.create()
   override val showDetails: Observable<Int>
     get() = _showDetails
-  //TODO: handle user swipes bottom sheet down
+  private val _hideDetails: PublishSubject<Unit> = PublishSubject.create()
+  override val hideDetails: Observable<Unit>
+    get() = _hideDetails
 
   private lateinit var bottomSheetBehavior: BottomSheetBehavior<MaterialCardView>
 
   override fun render(state: AnilistViewState) {
-    state.anime?.let(animeEpoxyController::setData)
-    binding.animeListL.pageLoadingPb.visible = state.isLoading && state.loadingType == PAGE
-    if(!state.isLoading) {
-      binding.animeListL.animeSrl.isRefreshing = false
-    }
+    state.pageState?.anime?.let(animeEpoxyController::setData)
+    binding.animeListL.pageLoadingPb.visible = state.loading == PAGE
+    binding.animeListL.totalFooterTv.visible = state.loading != PAGE
+    binding.animeListL.totalFooterTv.text = resources?.getString(R.string.total, state.pageState?.anime?.size)
+    binding.animeListL.animeSrl.isRefreshing = state.loading == RELOAD
     binding.animeListL.errorFooterTv.apply {
       visible = state.error != null
       state.error?.let { text = it }
@@ -111,6 +116,8 @@ class AnilistController : Controller(), AnilistView {
               if(lastVisibleItemPosition != RecyclerView.NO_POSITION
                 && lastVisibleItemPosition + ANIME_ITEMS_RESERVE >= totalItemsCount) {
                 _loadAnimePage.onNext(Unit)
+              } else {
+                _hideDetails.onNext(Unit)
               }
             }
           }
@@ -121,21 +128,19 @@ class AnilistController : Controller(), AnilistView {
 
   private fun setupBottomSheet() {
     bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsL.root)
-    /*bottomSheetBehavior.addBottomSheetCallback(
+    bottomSheetBehavior.addBottomSheetCallback(
       object : BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
           when(newState) {
-            BottomSheetBehavior.STATE_EXPANDED -> {
-              bottomSheetBehavior.setPeekHeight(600)
-            }
+            BottomSheetBehavior.STATE_COLLAPSED -> { _hideDetails.onNext(Unit) }
           }
         }
 
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
         }
       }
-    )*/
+    )
   }
 
   private fun bindDetailsData(details: Anime) {
