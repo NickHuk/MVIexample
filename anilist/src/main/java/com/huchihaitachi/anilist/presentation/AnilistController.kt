@@ -2,7 +2,9 @@ package com.huchihaitachi.anilist.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -59,10 +61,14 @@ class AnilistController : Controller(), AnilistView {
       state.error?.let { text = it }
     }
     bottomSheetBehavior.state = if(state.details == null) {
+      binding.animeListL.animeErv.isEnabled = true
+      binding.animeListL.dimOverlayView.visible = false
       BottomSheetBehavior.STATE_COLLAPSED
     }
     else {
       bindDetailsData(state.details)
+      binding.animeListL.animeErv.isEnabled = false
+      binding.animeListL.dimOverlayView.visible = true
       BottomSheetBehavior.STATE_EXPANDED
     }
   }
@@ -125,7 +131,7 @@ class AnilistController : Controller(), AnilistView {
 
           override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if(!recyclerView.canScrollVertically(1)
+            if(!recyclerView.canScrollVertically(DIRECTION_DOWN)
               && newState == SCROLL_STATE_DRAGGING) { //can scroll down
               _loadAnimePage.onNext(Unit)
             }
@@ -136,13 +142,15 @@ class AnilistController : Controller(), AnilistView {
   }
 
   private fun setupBottomSheet() {
+
     bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsL.root)
     bottomSheetBehavior.addBottomSheetCallback(
       object : BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
           when(newState) {
-            BottomSheetBehavior.STATE_COLLAPSED -> { _hideDetails.onNext(Unit) }
+            BottomSheetBehavior.STATE_COLLAPSED -> {
+              _hideDetails.onNext(Unit) }
           }
         }
 
@@ -185,5 +193,6 @@ class AnilistController : Controller(), AnilistView {
 
   companion object {
     const val ANIME_ITEMS_RESERVE = 4
+    const val DIRECTION_DOWN = 1
   }
 }
