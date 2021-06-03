@@ -5,11 +5,13 @@ import com.huchihaItachi.mviexample.useCaseImpl.IsLoggedInUseCaseImpl
 import com.huchihaItachi.mviexample.useCaseImpl.LoadAnimeUseCaseImpl
 import com.huchihaItachi.mviexample.useCaseImpl.LoadPageUseCaseImpl
 import com.huchihaItachi.mviexample.useCaseImpl.LoginUseCaseImpl
+import com.huchihaItachi.mviexample.useCaseImpl.RefreshPageUseCaseImpl
 import com.huchihaitachi.usecase.GetStringResourceUseCase
 import com.huchihaitachi.usecase.IsLoggedInUseCase
 import com.huchihaitachi.usecase.LoadAnimeUseCase
 import com.huchihaitachi.usecase.LoadPageUseCase
 import com.huchihaitachi.usecase.LoginUseCase
+import com.huchihaitachi.usecase.RefreshPageUseCase
 import dagger.Binds
 import dagger.Module
 
@@ -24,6 +26,9 @@ interface UseCaseModule {
 
   @Binds
   fun bindLoadPageUseCase(loadPageUseCaseImpl: LoadPageUseCaseImpl): LoadPageUseCase
+
+  @Binds
+  fun bindRefreshPageUseCase(refreshPageUseCaseImpl: RefreshPageUseCaseImpl): RefreshPageUseCase
 
   @Binds
   fun bindGetStringResourceUseCase(getStringResourceUseCaseImpl: GetStringResourceUseCaseImpl): GetStringResourceUseCase

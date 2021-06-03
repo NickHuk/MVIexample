@@ -1,30 +1,29 @@
 package com.huchihaitachi.loginwebview.presentation
 
 import com.huchihaitachi.base.BasePresenter
+import com.huchihaitachi.base.RxSchedulers
 import com.huchihaitachi.loginwebview.di.scope.LoginWebScope
 import com.huchihaitachi.loginwebview.presentation.coordination.RootTransaction
 import com.huchihaitachi.usecase.LoginUseCase
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
 @LoginWebScope
 class LoginWebPresenter @Inject constructor(
   private val loginUseCase: LoginUseCase,
-  private val rootTransaction: RootTransaction
+  private val rootTransaction: RootTransaction,
+  loginWebViewState: LoginWebViewState,
+  rxSchedulers: RxSchedulers
 ) : BasePresenter<LoginWebView, LoginWebViewState>(
-  LoginWebViewState(false, null)
+  loginWebViewState, rxSchedulers
 ) {
 
   override fun bindIntents() {
     view?.loginCodeIntent
-      ?.observeOn(Schedulers.io())
+      ?.observeOn(rxSchedulers.io)
       ?.flatMapCompletable { code -> loginUseCase(code) }
       ?.toSingleDefault(LoginWebViewState(true, null))
       ?.onErrorReturn { throwable -> LoginWebViewState(false, throwable) }
-      ?.observeOn(AndroidSchedulers.mainThread())
+      ?.observeOn(rxSchedulers.ui)
       ?.subscribe { s ->
         state = s
         rootTransaction.viewAnime()

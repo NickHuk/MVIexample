@@ -14,5 +14,5 @@ class LoadPageUseCaseImpl @Inject constructor(
 ) : LoadPageUseCase {
 
   override fun invoke(page: Int, perPage: Int): Single<Page> =
-    animeRepository.getAnimePage(page, perPage).subscribeOn(Schedulers.io())
+    animeRepository.getAnimePage(page, perPage)
 }

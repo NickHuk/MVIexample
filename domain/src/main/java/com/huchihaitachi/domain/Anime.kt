@@ -1,6 +1,6 @@
 package com.huchihaitachi.domain
 
-data class Anime(
+open class Anime(
   val id: Int,
   val title: String? = null,
   val type: Type? = null,
@@ -10,5 +10,7 @@ data class Anime(
   val episodes: Int?  = null,
   val duration: Int? = null, //minutes in general
   val coverImage: String? = null,
-  val bannerImage: String? = null
-)
+  val bannerImage: String? = null,
+  override val timeOfBirth: Long,
+  override val timeToStale: Long
+) : Dirtyable

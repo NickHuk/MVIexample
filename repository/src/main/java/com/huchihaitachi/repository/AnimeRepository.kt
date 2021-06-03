@@ -6,6 +6,7 @@ import io.reactivex.Single
 
 interface AnimeRepository {
 
-  fun getAnimePage(page: Int, perPage: Int): Single<Page>
+  fun getAnimePage(pageNum: Int, perPage: Int): Single<Page>
+  fun refresh(perPage: Int): Single<Page>
   fun getAnime(id: Int): Single<Anime>
 }

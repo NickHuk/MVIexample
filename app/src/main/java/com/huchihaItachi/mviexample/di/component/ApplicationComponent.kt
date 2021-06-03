@@ -1,6 +1,7 @@
 package com.huchihaItachi.mviexample.di.component
 
 import android.content.Context
+import com.huchihaItachi.database.di.DatabaseModule
 import com.huchihaItachi.mviexample.MVIApplication
 import com.huchihaItachi.mviexample.di.module.ApplicationModule
 import com.huchihaItachi.mviexample.di.module.DataSourceModule
@@ -18,7 +19,8 @@ import javax.inject.Singleton
     RemoteAPIModule::class,
     DataSourceModule::class,
     RepositoryModule::class,
-    UseCaseModule::class
+    UseCaseModule::class,
+    DatabaseModule::class
   ]
 )
 interface ApplicationComponent {

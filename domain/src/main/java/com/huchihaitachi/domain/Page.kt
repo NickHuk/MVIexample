@@ -1,9 +1,10 @@
 package com.huchihaitachi.domain
 
-data class Page(
+open class Page(
+  val currentPage: Int,
   val perPage: Int?,
-  val currentPage: Int?,
-  val lastPage: Int?,
   val hasNextPage: Boolean?,
-  val anime: List<Anime>?
-)
+  val anime: List<Anime>?,
+  override val timeOfBirth: Long,
+  override val timeToStale: Long,
+): Dirtyable

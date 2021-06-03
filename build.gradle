@@ -5,6 +5,7 @@ buildscript {
     ext.dagger_version = '2.35.1'
     ext.rx_java_version = '2.2.21'
     ext.rx_android_version = '2.1.1'
+    ext.room_version = '2.3.0'
     ext.retrofit_version = '2.9.0'
     ext.okhttp_version = '4.9.1'
     ext.gson_version = '2.9.0'
@@ -15,6 +16,7 @@ buildscript {
     ext.epoxy_version = '4.6.1'
     ext.glide_version = '4.12.0'
     ext.timber_version = '4.7.1'
+    ext.mock_version = '1.11.0'
     repositories {
         google()
         mavenCentral()

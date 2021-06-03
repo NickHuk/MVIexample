@@ -13,7 +13,6 @@ import com.google.android.material.card.MaterialCardView
 import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.databinding.ControllerAnilistBinding
 import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
-
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
@@ -78,6 +77,7 @@ class AnilistController : Controller(), AnilistView {
     setupViews()
     presenter.bind(this)
     presenter.bindIntents()
+    _loadAnimePage.onNext(Unit)
     return binding.root
   }
 

@@ -67,6 +67,8 @@ dependencies {
   implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
   //gson
   implementation "com.squareup.retrofit2:converter-gson:$gson_version"
+  //room
+  implementation "androidx.room:room-runtime:$room_version"
   //timber
   implementation "com.jakewharton.timber:timber:$timber_version"
   testImplementation 'junit:junit:4.+'
@@ -82,4 +84,5 @@ dependencies {
   implementation project(':login')
   implementation project(':loginWebView')
   implementation project(':anilist')
+  implementation project(':database')
 }

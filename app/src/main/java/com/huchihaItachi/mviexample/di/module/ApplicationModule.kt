@@ -3,6 +3,7 @@ package com.huchihaItachi.mviexample.di.module
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
+import com.huchihaitachi.domain.TimeProvider
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -22,5 +23,9 @@ interface ApplicationModule {
     @Singleton
     @Provides
     fun provideResources(context: Context): Resources = context.resources
+
+    @Singleton
+    @Provides
+    fun provideTimeProvider(): TimeProvider = TimeProvider()
   }
 }

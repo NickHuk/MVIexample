@@ -8,50 +8,43 @@ import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.base.BasePresenter
+import com.huchihaitachi.base.RxSchedulers
 import com.huchihaitachi.domain.Anime
+import com.huchihaitachi.domain.Page
 import com.huchihaitachi.usecase.GetStringResourceUseCase
 import com.huchihaitachi.usecase.LoadAnimeUseCase
 import com.huchihaitachi.usecase.LoadPageUseCase
+import com.huchihaitachi.usecase.RefreshPageUseCase
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 
 @AnilistScope
 class AnilistPresenter @Inject constructor(
   private val loadPageUseCase: LoadPageUseCase,
+  private val refreshPageUseCase: RefreshPageUseCase,
   private val loadAnimeUseCase: LoadAnimeUseCase,
-  private val getStringResourceUseCase: GetStringResourceUseCase
-) : BasePresenter<AnilistView, AnilistViewState>(
-  AnilistViewState(NOT_LOADING, null, null, null)
-) {
-
-  init {
-    disposables.add(loadPage(0)
-      .map { partialState ->
-        partialState.createState()
-      }
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe { s -> state = s }
-    )
-  }
+  private val getStringResourceUseCase: GetStringResourceUseCase,
+  anilistViewState: AnilistViewState,
+  rxSchedulers: RxSchedulers,
+) : BasePresenter<AnilistView, AnilistViewState>(anilistViewState, rxSchedulers) {
 
   override fun bindIntents() {
     view?.let { view ->
       // load page
       val loadPageIntent = view.loadAnimePage
-        .observeOn(Schedulers.io())
+        .observeOn(rxSchedulers.io)
         .filter { _ -> state.pageState?.hasNextPage == true && state.loading != RELOAD && state.loading != PAGE }
         .flatMap { _ -> loadPage(state.pageState?.currentPage!! + 1) }
       //reload
       val reloadIntent = view.reload
-        .observeOn(Schedulers.io())
+        .observeOn(rxSchedulers.io)
         .filter { _ -> state.loading != RELOAD }
-        .flatMap { unit -> loadPage(0) }
+        .flatMap { unit -> refreshPage() }
       //details
       val detailsIntent = view.showDetails
-        .observeOn(Schedulers.io())
+        .observeOn(rxSchedulers.io)
         .switchMap { id ->
           loadAnimeUseCase(id)
             .toObservable()
@@ -72,7 +65,7 @@ class AnilistPresenter @Inject constructor(
       val hideDetailsIntent = view.hideDetails
         .filter { state.loading == NOT_LOADING }
         .map {
-          AnilistPartialState()
+          AnilistPartialState(error = state.error)
         }
       val intents = Observable.merge(loadPageIntent, reloadIntent, detailsIntent, hideDetailsIntent)
       intents.scan(state, ::animeStateReducer)
@@ -91,11 +84,25 @@ class AnilistPresenter @Inject constructor(
           pageState = PageState(page.anime, page.currentPage, page.hasNextPage)
         )
       }
-      .startWith(
+      .startWith(AnilistPartialState(loading = PAGE))
+      .onErrorReturn { throwable ->
         AnilistPartialState(
-          loading = if(pageNum == 0) RELOAD else PAGE
+          error = when(throwable) {
+            is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
+            else -> throwable.message
+          }
         )
-      )
+      }
+
+  private fun refreshPage(): Observable<AnilistPartialState> =
+    refreshPageUseCase(PER_PAGE)
+      .toObservable()
+      .map { page ->
+        AnilistPartialState(
+          pageState = PageState(page.anime, page.currentPage, page.hasNextPage)
+        )
+      }
+      .startWith(AnilistPartialState(loading = RELOAD))
       .onErrorReturn { throwable ->
         AnilistPartialState(
           error = when(throwable) {
@@ -109,17 +116,20 @@ class AnilistPresenter @Inject constructor(
     previousState.copy(
       changes.loading,
       changes.details,
-      when (previousState.loading) {
-        PAGE -> changes.pageState?.copy(
-          mutableListOf<Anime>().apply {
-            previousState.pageState?.anime?.let(::addAll)
-            changes.pageState.anime?.let(::addAll)
-          }
-        )
-        RELOAD ->
-          changes.pageState?.copy()
-        NOT_LOADING ->
-          previousState.pageState?.copy()
+      if(changes.error == null) {
+        when (previousState.loading) {
+          PAGE -> changes.pageState?.copy(
+            mutableListOf<Anime>().apply {
+              previousState.pageState?.anime?.let(::addAll)
+              changes.pageState.anime?.let(::addAll)
+            }
+          )
+          RELOAD -> changes.pageState?.copy()
+          NOT_LOADING -> previousState.pageState?.copy()
+        }
+      }
+       else {
+        previousState.pageState?.copy()
       },
       changes.error
     )
