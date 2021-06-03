@@ -10,15 +10,15 @@ import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.base.BasePresenter
 import com.huchihaitachi.base.RxSchedulers
 import com.huchihaitachi.domain.Anime
-import com.huchihaitachi.domain.Page
 import com.huchihaitachi.usecase.GetStringResourceUseCase
 import com.huchihaitachi.usecase.LoadAnimeUseCase
 import com.huchihaitachi.usecase.LoadPageUseCase
 import com.huchihaitachi.usecase.RefreshPageUseCase
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.pow
 
 @AnilistScope
 class AnilistPresenter @Inject constructor(
@@ -35,7 +35,12 @@ class AnilistPresenter @Inject constructor(
       // load page
       val loadPageIntent = view.loadAnimePage
         .observeOn(rxSchedulers.io)
-        .filter { _ -> state.pageState?.hasNextPage == true && state.loading != RELOAD && state.loading != PAGE }
+        .filter { _ ->
+          state.pageState?.hasNextPage == true
+            && state.loading != RELOAD
+            && state.loading != PAGE
+            && state.loadingEnabled
+        }
         .flatMap { _ -> loadPage(state.pageState?.currentPage!! + 1) }
       //reload
       val reloadIntent = view.reload
@@ -85,14 +90,29 @@ class AnilistPresenter @Inject constructor(
         )
       }
       .startWith(AnilistPartialState(loading = PAGE))
-      .onErrorReturn { throwable ->
-        AnilistPartialState(
-          error = when(throwable) {
-            is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
-            else -> throwable.message
-          }
+      .onErrorResumeNext(::loadPageErrorHandler)
+
+  private fun loadPageErrorHandler(throwable: Throwable): ObservableSource<AnilistPartialState> =
+    when (throwable) {
+      is ApolloNetworkException ->
+        Observable.timer(
+          if (state.backoff < 4) {
+            (2.0.pow(state.backoff.toDouble()) * 1000L).toLong()
+          } else {
+            MAX_BACKOFF
+          },
+          TimeUnit.MILLISECONDS
         )
-      }
+          .map { AnilistPartialState() }
+          .startWith(
+            AnilistPartialState(
+              error = getStringResourceUseCase(R.string.no_connection),
+              loadingEnabled = false,
+              backoff = state.backoff + 1
+            )
+          )
+      else -> Observable.just(AnilistPartialState(error = throwable.message))
+    }
 
   private fun refreshPage(): Observable<AnilistPartialState> =
     refreshPageUseCase(PER_PAGE)
@@ -113,28 +133,52 @@ class AnilistPresenter @Inject constructor(
       }
 
   private fun animeStateReducer(previousState: AnilistViewState, changes: AnilistPartialState) =
-    previousState.copy(
-      changes.loading,
-      changes.details,
-      if(changes.error == null) {
-        when (previousState.loading) {
-          PAGE -> changes.pageState?.copy(
+    if (changes.error == null) {
+      when (previousState.loading) {
+        PAGE -> previousState.copy(
+          changes.loading,
+          changes.details,
+          changes.pageState?.copy(
             mutableListOf<Anime>().apply {
               previousState.pageState?.anime?.let(::addAll)
               changes.pageState.anime?.let(::addAll)
             }
+          ),
+          changes.error,
+          changes.loadingEnabled,
+          changes.backoff
+        )
+        RELOAD ->
+          previousState.copy(
+            changes.loading,
+            changes.details,
+            changes.pageState?.copy(),
+            changes.error,
+            changes.loadingEnabled,
+            changes.backoff
           )
-          RELOAD -> changes.pageState?.copy()
-          NOT_LOADING -> previousState.pageState?.copy()
-        }
+        NOT_LOADING -> previousState.copy(
+          changes.loading,
+          changes.details,
+          previousState.pageState?.copy(),
+          changes.error,
+          changes.loadingEnabled,
+          previousState.backoff
+        )
       }
-       else {
-        previousState.pageState?.copy()
-      },
-      changes.error
-    )
+    } else {
+      previousState.copy(
+        changes.loading,
+        changes.details,
+        previousState.pageState?.copy(),
+        changes.error,
+        changes.loadingEnabled,
+        changes.backoff
+      )
+    }
 
   companion object {
     const val PER_PAGE = 8
+    const val MAX_BACKOFF = 16000L
   }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import com.bluelinelabs.conductor.Controller
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -119,6 +120,14 @@ class AnilistController : Controller(), AnilistView {
               } else {
                 _hideDetails.onNext(Unit)
               }
+            }
+          }
+
+          override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if(!recyclerView.canScrollVertically(1)
+              && newState == SCROLL_STATE_DRAGGING) { //can scroll down
+              _loadAnimePage.onNext(Unit)
             }
           }
         }

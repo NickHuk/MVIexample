@@ -9,7 +9,9 @@ data class AnilistPartialState (
   val loading: LoadingType = NOT_LOADING,
   val details: Anime? = null,
   val pageState: PageState? = null,
-  val error: String? = null
+  val error: String? = null,
+  val loadingEnabled: Boolean = true,
+  val backoff: Int = 0
 ) {
 
   fun createState() = AnilistViewState(
