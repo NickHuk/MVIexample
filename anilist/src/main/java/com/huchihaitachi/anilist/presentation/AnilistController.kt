@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
@@ -62,13 +63,23 @@ class AnilistController : Controller(), AnilistView {
     }
     bottomSheetBehavior.state = if(state.details == null) {
       binding.animeListL.animeErv.isEnabled = true
-      binding.animeListL.dimOverlayView.visible = false
+      binding.animeListL.dimOverlayView.animate()
+        .alpha(0f)
+        .apply {
+          duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
+          interpolator = AccelerateDecelerateInterpolator()
+        }
       BottomSheetBehavior.STATE_COLLAPSED
     }
     else {
       bindDetailsData(state.details)
       binding.animeListL.animeErv.isEnabled = false
-      binding.animeListL.dimOverlayView.visible = true
+      binding.animeListL.dimOverlayView.animate()
+        .alpha(1f)
+        .apply {
+          duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
+          interpolator = AccelerateDecelerateInterpolator()
+        }
       BottomSheetBehavior.STATE_EXPANDED
     }
   }
