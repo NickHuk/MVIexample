@@ -62,7 +62,7 @@ class AnilistController : Controller(), AnilistView {
       state.error?.let { text = it }
     }
     bottomSheetBehavior.state = if(state.details == null) {
-      binding.animeListL.animeErv.isEnabled = true
+      binding.animeListL.dimOverlayView.isClickable = false
       binding.animeListL.dimOverlayView.animate()
         .alpha(0f)
         .apply {
@@ -73,7 +73,7 @@ class AnilistController : Controller(), AnilistView {
     }
     else {
       bindDetailsData(state.details)
-      binding.animeListL.animeErv.isEnabled = false
+      binding.animeListL.dimOverlayView.isClickable = true
       binding.animeListL.dimOverlayView.animate()
         .alpha(1f)
         .apply {
@@ -108,6 +108,7 @@ class AnilistController : Controller(), AnilistView {
   private fun setupViews() {
     setupRecyclerView()
     setupSwipeToRefresh()
+    setupContentOverlay()
     setupBottomSheet()
   }
 
@@ -169,6 +170,12 @@ class AnilistController : Controller(), AnilistView {
         }
       }
     )
+  }
+
+  private fun setupContentOverlay() {
+    binding.animeListL.dimOverlayView.setOnClickListener {
+      _hideDetails.onNext(Unit)
+    }
   }
 
   private fun bindDetailsData(details: Anime) {

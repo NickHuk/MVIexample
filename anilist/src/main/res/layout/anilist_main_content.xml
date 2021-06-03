@@ -52,8 +52,8 @@
       android:id="@+id/dim_overlay_view"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:focusable="true"
+      android:clickable="true"
       android:background="@color/semi_transparent_black"
       />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
