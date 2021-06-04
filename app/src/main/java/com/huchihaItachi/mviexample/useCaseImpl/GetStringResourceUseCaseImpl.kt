@@ -11,5 +11,5 @@ class GetStringResourceUseCaseImpl @Inject constructor(
 ) : GetStringResourceUseCase {
 
   override fun invoke(resId: Int, vararg params: Any): String =
-    resourcesRepository.getString(resId, params)
+    resourcesRepository.getString(resId, *params)
 }

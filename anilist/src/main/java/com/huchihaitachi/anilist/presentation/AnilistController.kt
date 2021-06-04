@@ -2,9 +2,7 @@ package com.huchihaitachi.anilist.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,17 +18,20 @@ import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
-import com.huchihaitachi.base.domain.localized
+import com.huchihaitachi.base.SpanFactory
 import com.huchihaitachi.base.domain.stringRes
+import com.huchihaitachi.base.setTextAndHighlight
 import com.huchihaitachi.base.setUrl
 import com.huchihaitachi.base.visible
 import com.huchihaitachi.domain.Anime
+import com.huchihaitachi.domain.Type
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 class AnilistController : Controller(), AnilistView {
   @Inject lateinit var presenter: AnilistPresenter
+  @Inject lateinit var spanFactory: SpanFactory
   lateinit var animeEpoxyController: AnimeEpoxyController
 
   private var _binding: ControllerAnilistBinding? = null
@@ -179,33 +180,48 @@ class AnilistController : Controller(), AnilistView {
   }
 
   private fun bindDetailsData(details: Anime) {
-    binding.detailsL.let { detailsBinding ->
-      details.coverImage?.let(detailsBinding.detailsCoverIv::setUrl)
-      details.title?.let { title ->
-        detailsBinding.titleTv.text = resources?.getString(
+    resources?.let { res ->
+      binding.detailsL.let { detailsBinding ->
+        detailsBinding.titleTv.setTextAndHighlight(
+          res,
+          spanFactory.createBold(),
           R.string.title,
-          title,
-          details.type?.stringRes?.let { resources?.getString(it) }
+          R.string.highlighted_title,
+          details.title,
+          (details.type ?: Type.ANIME).stringRes.let(res::getString)
         )
-      }
-      detailsBinding.beginningTv.text = resources?.getString(
-        R.string.beginning,
-        details.season?.localized(resources),
-        details.seasonYear
-      )
-      details.episodes?.let { episodes ->
-        detailsBinding.episodesTv.text = resources?.getString(R.string.num_episodes, episodes)
-      }
-      details.duration?.let { duration ->
-        (duration / 60).let { hours ->
-          detailsBinding.durationTv.text = if(hours == 0) {
-            resources?.getString(R.string.episode_duration_minutes, duration % 60)
-          } else {
-            resources?.getString(R.string.episode_duration_hours, hours, duration % 60)
+        details.coverImage?.let(detailsBinding.detailsCoverIv::setUrl)
+        detailsBinding.episodesTv.setTextAndHighlight(
+          res,
+          spanFactory.createBold(),
+          R.string.num_episodes, R.string.highlighted_num_episodes,
+          details.episodes
+        )
+        details.duration?.let { duration ->
+          (duration / 60).let { hours ->
+            if(hours == 0) {
+              detailsBinding.durationTv.setTextAndHighlight(
+                res,
+                spanFactory.createBold(),
+                R.string.episode_duration_minutes,
+                R.string.highlighted_episode_duration,
+                duration % 60
+              )
+            } else {
+              detailsBinding.durationTv.setTextAndHighlight(
+                res,
+                spanFactory.createBold(),
+                R.string.episode_duration_hours,
+                R.string.highlighted_episode_duration,
+                hours,
+                duration % 60
+              )
+            }
+
           }
         }
+        details.description?.let { description -> detailsBinding.descriptionTv.text = details.description }
       }
-      details.description?.let { description -> detailsBinding.descriptionTv.text = details.description }
     }
   }
 
