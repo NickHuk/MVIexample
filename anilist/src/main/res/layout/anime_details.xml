@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:shapeAppearanceOverlay="@style/BottomSheetCard"
     android:layout_width="match_parent"
     android:layout_height="@dimen/height_details"
     android:layout_marginBottom="@dimen/margin_bottom_details_card"
@@ -11,7 +12,6 @@
     app:layout_behavior="@string/bottom_sheet_behavior"
     app:behavior_peekHeight="0dp"
     app:behavior_hideable="false"
-    app:cardCornerRadius="@dimen/radius_details_card"
     >
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,13 +22,24 @@
       android:padding="@dimen/padding_details"
       >
 
+    <View
+        android:id="@+id/handle"
+        android:layout_width="@dimen/width_bottom_sheet_handle"
+        android:layout_height="@dimen/height_bottom_sheet_handle"
+        android:background="@drawable/bottom_sheet_handle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <ImageView
         android:id="@+id/details_cover_iv"
         android:layout_width="@dimen/width_details_cover"
         android:layout_height="@dimen/height_details_cover"
         android:scaleType="centerCrop"
+        android:layout_marginTop="@dimen/margin_bottom_bottom_sheet_handle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/handle"
         />
 
     <TextView
@@ -36,9 +47,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_end_details_cover"
+        android:layout_marginTop="@dimen/margin_bottom_bottom_sheet_handle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/details_cover_iv"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/handle"
         />
 
     <TextView

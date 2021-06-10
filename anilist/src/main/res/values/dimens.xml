@@ -22,4 +22,8 @@
   <dimen name="margin_bottom_item_title">8dp</dimen>
   <dimen name="width_anime_divider">6dp</dimen>
   <dimen name="height_anime_divider">8dp</dimen>
+  <dimen name="width_bottom_sheet_handle">48dp</dimen>
+  <dimen name="height_bottom_sheet_handle">4dp</dimen>
+  <dimen name="radius_bottom_sheet_handle">2dp</dimen>
+  <dimen name="margin_bottom_bottom_sheet_handle">16dp</dimen>
 </resources>
