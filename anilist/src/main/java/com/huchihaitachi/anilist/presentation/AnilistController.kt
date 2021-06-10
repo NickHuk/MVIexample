@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import com.bluelinelabs.conductor.Controller
@@ -18,6 +18,7 @@ import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
+import com.huchihaitachi.anilist.presentation.animeList.GridDividerItemDecoration
 import com.huchihaitachi.base.SpanFactory
 import com.huchihaitachi.base.domain.stringRes
 import com.huchihaitachi.base.setTextAndHighlight
@@ -124,15 +125,26 @@ class AnilistController : Controller(), AnilistView {
       _showDetails.onNext(details)
     }
     binding.animeListL.animeErv.apply {
-      layoutManager = LinearLayoutManager(context)
+      layoutManager = GridLayoutManager(
+        context,
+        resources.getInteger(R.integer.anime_span_count),
+        GridLayoutManager.VERTICAL,
+        false
+      )
+      addItemDecoration(
+        GridDividerItemDecoration(
+          resources.getDimension(R.dimen.width_anime_divider),
+          resources.getDimension(R.dimen.height_anime_divider)
+        )
+      )
       adapter = animeEpoxyController.adapter
       addOnScrollListener(
         object: RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            (layoutManager as LinearLayoutManager).let { linearLayoutManager ->
-              val totalItemsCount = linearLayoutManager.itemCount
-              val lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition()
+            (layoutManager as GridLayoutManager).let { gridLayoutManager ->
+              val totalItemsCount = gridLayoutManager.itemCount
+              val lastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition()
               if(lastVisibleItemPosition != RecyclerView.NO_POSITION
                 && lastVisibleItemPosition + ANIME_ITEMS_RESERVE >= totalItemsCount) {
                 _loadAnimePage.onNext(Unit)

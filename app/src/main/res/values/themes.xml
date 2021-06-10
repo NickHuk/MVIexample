@@ -18,6 +18,7 @@
     <!-- Status bar color. -->
     <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
     <!-- Customize your theme here. -->
+    <item name="textAppearanceSubtitle1">@style/AnimeSubtitle1</item>
   </style>
 
 </resources>
