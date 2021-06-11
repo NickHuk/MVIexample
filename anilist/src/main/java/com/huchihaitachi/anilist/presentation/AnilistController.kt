@@ -55,17 +55,17 @@ class AnilistController : Controller(), AnilistView {
 
   override fun render(state: AnilistViewState) {
     state.pageState?.anime?.let(animeEpoxyController::setData)
-    binding.animeListL.pageLoadingPb.visible = state.loading == PAGE
-    binding.animeListL.totalFooterTv.visible = state.loading != PAGE
-    binding.animeListL.totalFooterTv.text = resources?.getString(R.string.total, state.pageState?.anime?.size)
-    binding.animeListL.animeSrl.isRefreshing = state.loading == RELOAD
-    binding.animeListL.errorFooterTv.apply {
+    binding.animeListLayout.pageLoadingPb.visible = state.loading == PAGE
+    binding.animeListLayout.totalFooterTv.visible = state.loading != PAGE
+    binding.animeListLayout.totalFooterTv.text = resources?.getString(R.string.total, state.pageState?.anime?.size)
+    binding.animeListLayout.animeSrl.isRefreshing = state.loading == RELOAD
+    binding.animeListLayout.errorFooterTv.apply {
       visible = state.error != null
       state.error?.let { text = it }
     }
     bottomSheetBehavior.state = if(state.details == null) {
-      binding.animeListL.dimOverlayView.isClickable = false
-      binding.animeListL.dimOverlayView.animate()
+      binding.animeListLayout.dimOverlayView.isClickable = false
+      binding.animeListLayout.dimOverlayView.animate()
         .alpha(0f)
         .apply {
           duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
@@ -75,8 +75,8 @@ class AnilistController : Controller(), AnilistView {
     }
     else {
       bindDetailsData(state.details)
-      binding.animeListL.dimOverlayView.isClickable = true
-      binding.animeListL.dimOverlayView.animate()
+      binding.animeListLayout.dimOverlayView.isClickable = true
+      binding.animeListLayout.dimOverlayView.animate()
         .alpha(1f)
         .apply {
           duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
@@ -115,7 +115,7 @@ class AnilistController : Controller(), AnilistView {
   }
 
   private fun setupSwipeToRefresh() {
-    binding.animeListL.animeSrl.setOnRefreshListener {
+    binding.animeListLayout.animeSrl.setOnRefreshListener {
       _reload.onNext(Unit)
     }
   }
@@ -124,7 +124,7 @@ class AnilistController : Controller(), AnilistView {
     animeEpoxyController = AnimeEpoxyController { details ->
       _showDetails.onNext(details)
     }
-    binding.animeListL.animeErv.apply {
+    binding.animeListLayout.animeErv.apply {
       layoutManager = GridLayoutManager(
         context,
         resources.getInteger(R.integer.anime_span_count),
@@ -168,7 +168,7 @@ class AnilistController : Controller(), AnilistView {
 
   private fun setupBottomSheet() {
 
-    bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsL.root)
+    bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsLayout.root)
     bottomSheetBehavior.addBottomSheetCallback(
       object : BottomSheetCallback() {
 
@@ -186,14 +186,14 @@ class AnilistController : Controller(), AnilistView {
   }
 
   private fun setupContentOverlay() {
-    binding.animeListL.dimOverlayView.setOnClickListener {
+    binding.animeListLayout.dimOverlayView.setOnClickListener {
       _hideDetails.onNext(Unit)
     }
   }
 
   private fun bindDetailsData(details: Anime) {
     resources?.let { res ->
-      binding.detailsL.let { detailsBinding ->
+      binding.detailsLayout.let { detailsBinding ->
         detailsBinding.titleTv.setTextAndHighlight(
           res,
           spanFactory.createBold(),
