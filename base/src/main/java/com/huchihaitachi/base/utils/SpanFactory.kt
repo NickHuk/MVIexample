@@ -1,4 +1,4 @@
-package com.huchihaitachi.base
+package com.huchihaitachi.base.utils
 
 import android.graphics.Typeface
 import android.text.style.StyleSpan

@@ -22,7 +22,7 @@ import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
 import com.huchihaitachi.anilist.presentation.animeList.GridDividerItemDecoration
-import com.huchihaitachi.base.SpanFactory
+import com.huchihaitachi.base.utils.SpanFactory
 import com.huchihaitachi.base.domain.stringRes
 import com.huchihaitachi.base.setTextAndHighlight
 import com.huchihaitachi.base.setUrl
