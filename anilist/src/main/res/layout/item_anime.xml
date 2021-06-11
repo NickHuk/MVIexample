@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/width_anime_card"
@@ -23,6 +24,16 @@
         tools:src="@drawable/dummy_image"
         />
 
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/anime_card_overlay"
+        app:layout_constraintBottom_toBottomOf="@id/thumbnail_iv"
+        app:layout_constraintEnd_toEndOf="@id/thumbnail_iv"
+        app:layout_constraintStart_toStartOf="@id/thumbnail_iv"
+        app:layout_constraintTop_toTopOf="@id/thumbnail_iv"
+        />
+
     <TextView
         android:id="@+id/name_tv"
         android:layout_width="0dp"
@@ -37,16 +48,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="test text"
-        />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/anime_card_overlay"
-        app:layout_constraintBottom_toBottomOf="@id/thumbnail_iv"
-        app:layout_constraintEnd_toEndOf="@id/thumbnail_iv"
-        app:layout_constraintStart_toStartOf="@id/thumbnail_iv"
-        app:layout_constraintTop_toTopOf="@id/thumbnail_iv"
         />
   </androidx.constraintlayout.widget.ConstraintLayout>
 

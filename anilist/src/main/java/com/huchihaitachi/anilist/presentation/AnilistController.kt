@@ -1,10 +1,13 @@
 package com.huchihaitachi.anilist.presentation
 
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
@@ -64,7 +67,7 @@ class AnilistController : Controller(), AnilistView {
       visible = state.error != null
       state.error?.let { text = it }
     }
-    binding.animeListLayout.dimOverlayView.isClickable = state.details == null
+    binding.animeListLayout.dimOverlayView.isClickable = state.details != null
     bottomSheetBehavior.state = if (state.details == null) {
       binding.animeListLayout.dimOverlayView.animate()
         .alpha(0f)
@@ -75,6 +78,7 @@ class AnilistController : Controller(), AnilistView {
       BottomSheetBehavior.STATE_COLLAPSED
     } else {
       bindDetailsData(state.details)
+
       binding.animeListLayout.dimOverlayView.animate()
         .alpha(1f)
         .apply {
@@ -233,7 +237,12 @@ class AnilistController : Controller(), AnilistView {
           }
         }
         details.description?.let { description ->
-          detailsBinding.descriptionTv.text = details.description
+          detailsBinding.descriptionTv.text =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+              Html.fromHtml(details.description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            } else {
+              Html.fromHtml(details.description)
+            }
         }
       }
     }
