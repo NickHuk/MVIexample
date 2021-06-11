@@ -54,6 +54,5 @@ class LoginWebController() : Controller(), LoginWebView {
   }
 
   override fun render(state: LoginWebViewState) {
-
   }
 }

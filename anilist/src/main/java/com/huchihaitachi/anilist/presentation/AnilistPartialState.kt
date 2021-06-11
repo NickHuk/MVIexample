@@ -5,7 +5,7 @@ import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.NOT_L
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.domain.Anime
 
-data class AnilistPartialState (
+data class AnilistPartialState(
   val loading: LoadingType = NOT_LOADING,
   val details: Anime? = null,
   val pageState: PageState? = null,

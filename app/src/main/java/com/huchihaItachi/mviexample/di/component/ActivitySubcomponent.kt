@@ -10,22 +10,22 @@ import dagger.Subcomponent
 
 @ActivityScope
 @Subcomponent(
-    modules = [
-        CoordinatorModule::class
-    ]
+  modules = [
+    CoordinatorModule::class
+  ]
 )
 interface ActivitySubcomponent {
 
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): ActivitySubcomponent
-    }
+  @Subcomponent.Factory
+  interface Factory {
+    fun create(): ActivitySubcomponent
+  }
 
-    fun loginSubcomponent(): LoginSubcomponent.Factory
+  fun loginSubcomponent(): LoginSubcomponent.Factory
 
-    fun loginWebSubcomponent(): LoginWebSubcomponent.Factory
+  fun loginWebSubcomponent(): LoginWebSubcomponent.Factory
 
-    fun anilistSubcomponent(): AnilistSubcomponent.Factory
+  fun anilistSubcomponent(): AnilistSubcomponent.Factory
 
-    fun inject(mainActivity: MainActivity)
+  fun inject(mainActivity: MainActivity)
 }

@@ -14,12 +14,8 @@ import com.huchihaitachi.usecase.LoadPageUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.verify
-import io.mockk.verifyAll
 import io.mockk.verifySequence
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.schedulers.TestScheduler
 import io.reactivex.subjects.PublishSubject
 import org.junit.Before
@@ -32,7 +28,7 @@ class AnilistPresenterTest {
   @MockK private lateinit var loadAnimeUseCase: LoadAnimeUseCase
   @MockK private lateinit var getStringResourceUseCase: GetStringResourceUseCase
   @MockK private lateinit var anilistView: AnilistView
-  @MockK private lateinit var  rxSchedulers: RxSchedulers
+  @MockK private lateinit var rxSchedulers: RxSchedulers
 
   @Before
   fun setup() {

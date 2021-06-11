@@ -4,7 +4,7 @@ import com.airbnb.epoxy.EpoxyAsyncUtil
 import com.airbnb.epoxy.TypedEpoxyController
 import com.huchihaitachi.domain.Anime
 
-class AnimeEpoxyController(val onClickListener: (Int) -> Unit): TypedEpoxyController<List<Anime>>(
+class AnimeEpoxyController(val onClickListener: (Int) -> Unit) : TypedEpoxyController<List<Anime>>(
   EpoxyAsyncUtil.getAsyncBackgroundHandler(),
   EpoxyAsyncUtil.getAsyncBackgroundHandler()
 ) {

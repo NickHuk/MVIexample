@@ -3,17 +3,18 @@ package com.huchihaItachi.database.entity
 import com.huchihaitachi.domain.Anime
 import com.huchihaitachi.domain.Page
 
-fun Page.toDbEntity(): PageEntity = PageEntity(currentPage, perPage, hasNextPage, timeOfBirth, timeToStale)
+fun Page.toDbEntity(): PageEntity =
+  PageEntity(currentPage, perPage, hasNextPage, timeOfBirth, timeToStale)
 
 fun PageAndAnime.toDomain() =
-    Page(
-      page.currentPage,
-      page.perPage,
-      page.hasNextPage,
-      anime.map(AnimeEntity::toDomain),
-      page.timeOfBirth,
-      page.timeToStale
-    )
+  Page(
+    page.currentPage,
+    page.perPage,
+    page.hasNextPage,
+    anime.map(AnimeEntity::toDomain),
+    page.timeOfBirth,
+    page.timeToStale
+  )
 
 fun Anime.toDbEntity(pageNum: Int, index: Int): AnimeEntity =
   AnimeEntity(

@@ -10,11 +10,9 @@ import com.huchihaItachi.database.entity.toDomain
 import com.huchihaitachi.datasource.AnimeLocalDataSource
 import com.huchihaitachi.domain.Anime
 import com.huchihaitachi.domain.EmptyAnime
-import com.huchihaitachi.domain.EmptyDirtyable
 import com.huchihaitachi.domain.EmptyPage
 import com.huchihaitachi.domain.Page
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +35,7 @@ class AnimeLocalDataSourceImpl @Inject constructor(
     pageDao.loadPage(pageNum)
       .map(PageAndAnime::toDomain)
       .onErrorReturn { throwable ->
-        when(throwable) {
+        when (throwable) {
           is EmptyResultSetException -> EmptyPage
           else -> throw throwable
         }
@@ -68,7 +66,7 @@ class AnimeLocalDataSourceImpl @Inject constructor(
     animeDao.loadAnime(id)
       .map(AnimeEntity::toDomain)
       .onErrorReturn { throwable ->
-        when(throwable) {
+        when (throwable) {
           is EmptyResultSetException -> EmptyAnime
           else -> throw throwable
         }

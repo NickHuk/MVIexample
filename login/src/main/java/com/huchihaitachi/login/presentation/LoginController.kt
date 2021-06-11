@@ -6,13 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.Controller
 import com.google.android.material.snackbar.Snackbar
-import com.huchihaitachi.base.OAUTH
 import com.huchihaitachi.login.databinding.ControllerLoginBinding
 import com.huchihaitachi.login.di.LoginSubcomponentProvider
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
-import javax.inject.Named
 
 class LoginController(args: Bundle?) : Controller(args), LoginView {
   @Inject lateinit var presenter: LoginPresenter
@@ -56,6 +54,5 @@ class LoginController(args: Bundle?) : Controller(args), LoginView {
   }
 
   override fun render(state: LoginViewState) {
-
   }
 }

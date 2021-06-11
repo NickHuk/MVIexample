@@ -1,11 +1,9 @@
 package com.huchihaItachi.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.huchihaItachi.database.entity.AnimeEntity
 import com.huchihaitachi.domain.Season
 import com.huchihaitachi.domain.Type
@@ -24,7 +22,8 @@ interface AnimeDao {
   @Query("""SELECT * FROM AnimeEntity WHERE id=:id""")
   fun loadAnime(id: Int): Single<AnimeEntity>
 
-  @Query("""UPDATE AnimeEntity SET 
+  @Query(
+    """UPDATE AnimeEntity SET 
     title=:title,
     type=:type,
     description=:description,
@@ -36,7 +35,8 @@ interface AnimeDao {
     bannerImage=:bannerImage,
     timeOfBirth=:timeOfBirth,
     timeToStale=:timeToStale
-    WHERE id=:id""")
+    WHERE id=:id"""
+  )
   fun updateAnime(
     id: Int,
     title: String?,

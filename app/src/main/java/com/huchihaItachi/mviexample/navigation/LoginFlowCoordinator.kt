@@ -7,7 +7,7 @@ import javax.inject.Inject
 @ActivityScope
 class LoginFlowCoordinator @Inject constructor(
   private val navigator: Navigator
-): LoginTransaction {
+) : LoginTransaction {
 
   fun start() {
     navigator.openLogin()

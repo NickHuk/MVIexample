@@ -8,7 +8,7 @@ import javax.inject.Singleton
 @Singleton
 class ResourcesRepositoryImpl @Inject constructor(
   private val resourcesDataSource: ResourcesDataSource
-): ResourcesRepository {
+) : ResourcesRepository {
 
   override fun getString(resId: Int, vararg params: Any): String =
     resourcesDataSource.getString(resId, *params)

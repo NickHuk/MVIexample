@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/width_anime_card"
     android:layout_height="@dimen/height_anime_card"
-    xmlns:tools="http://schemas.android.com/tools"
     >
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,36 +17,36 @@
         android:layout_width="@dimen/width_thumbnail"
         android:layout_height="@dimen/height_thumbnail"
         android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         tools:src="@drawable/dummy_image"
+        />
+
+    <TextView
+        android:id="@+id/name_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_bottom_item_title"
+        android:layout_marginEnd="@dimen/margin_end_item_title"
+        android:layout_marginStart="@dimen/margin_start_item_title"
+        android:gravity="end"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textColor="?attr/colorOnPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="test text"
         />
 
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/anime_card_overlay"
+        app:layout_constraintBottom_toBottomOf="@id/thumbnail_iv"
+        app:layout_constraintEnd_toEndOf="@id/thumbnail_iv"
         app:layout_constraintStart_toStartOf="@id/thumbnail_iv"
         app:layout_constraintTop_toTopOf="@id/thumbnail_iv"
-        app:layout_constraintEnd_toEndOf="@id/thumbnail_iv"
-        app:layout_constraintBottom_toBottomOf="@id/thumbnail_iv"
-      />
-
-    <TextView
-        android:id="@+id/name_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceSubtitle1"
-        android:textColor="?attr/colorOnPrimary"
-        android:gravity="end"
-        android:layout_marginStart="@dimen/margin_start_item_title"
-        android:layout_marginEnd="@dimen/margin_end_item_title"
-        android:layout_marginBottom="@dimen/margin_bottom_item_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="test text"
         />
   </androidx.constraintlayout.widget.ConstraintLayout>
 

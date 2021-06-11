@@ -61,7 +61,7 @@ class AnimeRemoteDataSourceImpl @Inject constructor(
           response.data?.media?.description,
           response.data?.media?.season?.toDomain(),
           response.data?.media?.seasonYear,
-          when(response.data?.media?.type) {
+          when (response.data?.media?.type) {
             ANIME -> response.data?.media?.episodes
             else -> response.data?.media?.chapters
           },

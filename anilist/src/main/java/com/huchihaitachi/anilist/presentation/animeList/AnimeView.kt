@@ -6,9 +6,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.airbnb.epoxy.CallbackProp
+import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
-import com.airbnb.epoxy.ModelProp
 import com.huchihaitachi.anilist.R
 import com.huchihaitachi.base.setUrl
 

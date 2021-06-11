@@ -1,8 +1,8 @@
 package com.huchihaitachi.anilist.di.component
 
-import com.huchihaitachi.anilist.presentation.AnilistController
 import com.huchihaitachi.anilist.di.moule.AnilistModule
 import com.huchihaitachi.anilist.di.scope.AnilistScope
+import com.huchihaitachi.anilist.presentation.AnilistController
 import dagger.Subcomponent
 
 @AnilistScope

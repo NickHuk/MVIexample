@@ -57,14 +57,15 @@ class AnilistController : Controller(), AnilistView {
     state.pageState?.anime?.let(animeEpoxyController::setData)
     binding.animeListLayout.pageLoadingPb.visible = state.loading == PAGE
     binding.animeListLayout.totalFooterTv.visible = state.loading != PAGE
-    binding.animeListLayout.totalFooterTv.text = resources?.getString(R.string.total, state.pageState?.anime?.size)
+    binding.animeListLayout.totalFooterTv.text =
+      resources?.getString(R.string.total, state.pageState?.anime?.size)
     binding.animeListLayout.animeSrl.isRefreshing = state.loading == RELOAD
     binding.animeListLayout.errorFooterTv.apply {
       visible = state.error != null
       state.error?.let { text = it }
     }
-    bottomSheetBehavior.state = if(state.details == null) {
-      binding.animeListLayout.dimOverlayView.isClickable = false
+    binding.animeListLayout.dimOverlayView.isClickable = state.details == null
+    bottomSheetBehavior.state = if (state.details == null) {
       binding.animeListLayout.dimOverlayView.animate()
         .alpha(0f)
         .apply {
@@ -72,10 +73,8 @@ class AnilistController : Controller(), AnilistView {
           interpolator = AccelerateDecelerateInterpolator()
         }
       BottomSheetBehavior.STATE_COLLAPSED
-    }
-    else {
+    } else {
       bindDetailsData(state.details)
-      binding.animeListLayout.dimOverlayView.isClickable = true
       binding.animeListLayout.dimOverlayView.animate()
         .alpha(1f)
         .apply {
@@ -139,14 +138,15 @@ class AnilistController : Controller(), AnilistView {
       )
       adapter = animeEpoxyController.adapter
       addOnScrollListener(
-        object: RecyclerView.OnScrollListener() {
+        object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             (layoutManager as GridLayoutManager).let { gridLayoutManager ->
               val totalItemsCount = gridLayoutManager.itemCount
               val lastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition()
-              if(lastVisibleItemPosition != RecyclerView.NO_POSITION
-                && lastVisibleItemPosition + ANIME_ITEMS_RESERVE >= totalItemsCount) {
+              if (lastVisibleItemPosition != RecyclerView.NO_POSITION
+                && lastVisibleItemPosition + ANIME_ITEMS_RESERVE >= totalItemsCount
+              ) {
                 _loadAnimePage.onNext(Unit)
               } else {
                 _hideDetails.onNext(Unit)
@@ -156,8 +156,9 @@ class AnilistController : Controller(), AnilistView {
 
           override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if(!recyclerView.canScrollVertically(DIRECTION_DOWN)
-              && newState == SCROLL_STATE_DRAGGING) { //can scroll down
+            if (!recyclerView.canScrollVertically(DIRECTION_DOWN)
+              && newState == SCROLL_STATE_DRAGGING
+            ) { //can scroll down
               _loadAnimePage.onNext(Unit)
             }
           }
@@ -173,9 +174,10 @@ class AnilistController : Controller(), AnilistView {
       object : BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-          when(newState) {
+          when (newState) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
-              _hideDetails.onNext(Unit) }
+              _hideDetails.onNext(Unit)
+            }
           }
         }
 
@@ -210,29 +212,29 @@ class AnilistController : Controller(), AnilistView {
           details.episodes
         )
         details.duration?.let { duration ->
-          (duration / 60).let { hours ->
-            if(hours == 0) {
-              detailsBinding.durationTv.setTextAndHighlight(
-                res,
-                spanFactory.createBold(),
-                R.string.episode_duration_minutes,
-                R.string.highlighted_episode_duration,
-                duration % 60
-              )
-            } else {
-              detailsBinding.durationTv.setTextAndHighlight(
-                res,
-                spanFactory.createBold(),
-                R.string.episode_duration_hours,
-                R.string.highlighted_episode_duration,
-                hours,
-                duration % 60
-              )
-            }
-
+          val hours = duration / 60
+          if (hours == 0) {
+            detailsBinding.durationTv.setTextAndHighlight(
+              res,
+              spanFactory.createBold(),
+              R.string.episode_duration_minutes,
+              R.string.highlighted_episode_duration,
+              duration % 60
+            )
+          } else {
+            detailsBinding.durationTv.setTextAndHighlight(
+              res,
+              spanFactory.createBold(),
+              R.string.episode_duration_hours,
+              R.string.highlighted_episode_duration,
+              hours,
+              duration % 60
+            )
           }
         }
-        details.description?.let { description -> detailsBinding.descriptionTv.text = details.description }
+        details.description?.let { description ->
+          detailsBinding.descriptionTv.text = details.description
+        }
       }
     }
   }

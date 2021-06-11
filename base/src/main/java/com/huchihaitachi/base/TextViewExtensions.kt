@@ -8,7 +8,7 @@ import androidx.annotation.StringRes
 fun TextView.setTextAndHighlight(
   resources: Resources,
   span: Any,
-  @StringRes textRes:  Int,
+  @StringRes textRes: Int,
   @StringRes highlightedPartRes: Int,
   vararg params: Any?
 ) {

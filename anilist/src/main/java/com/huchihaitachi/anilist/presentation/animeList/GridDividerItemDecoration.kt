@@ -12,22 +12,22 @@ class GridDividerItemDecoration @JvmOverloads constructor(
 ) : RecyclerView.ItemDecoration() {
 
   override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: State) {
-      parent.getChildAdapterPosition(view).let { itemPosition ->
-        (parent.layoutManager as? GridLayoutManager)?.let { layoutManager ->
-          if(itemPosition != RecyclerView.NO_POSITION) {
-            val spanCount = layoutManager.spanCount
-            parent.adapter?.let { adapter ->
-              outRect.top = height.toInt()
-              outRect.left = when (itemPosition % spanCount) {
-                0 -> 0
-                else -> width.toInt()
-              }
-              if (itemPosition > parent.layoutManager!!.childCount - spanCount - 1) {
-                outRect.bottom = width.toInt()
-              }
+    parent.getChildAdapterPosition(view).let { itemPosition ->
+      (parent.layoutManager as? GridLayoutManager)?.let { layoutManager ->
+        if (itemPosition != RecyclerView.NO_POSITION) {
+          val spanCount = layoutManager.spanCount
+          parent.adapter?.let { adapter ->
+            outRect.top = height.toInt()
+            outRect.left = when (itemPosition % spanCount) {
+              0 -> 0
+              else -> width.toInt()
+            }
+            if (itemPosition > parent.layoutManager!!.childCount - spanCount - 1) {
+              outRect.bottom = width.toInt()
             }
           }
         }
       }
+    }
   }
 }
