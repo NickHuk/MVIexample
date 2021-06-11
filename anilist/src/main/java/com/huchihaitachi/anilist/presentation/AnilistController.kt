@@ -78,7 +78,6 @@ class AnilistController : Controller(), AnilistView {
       BottomSheetBehavior.STATE_COLLAPSED
     } else {
       bindDetailsData(state.details)
-
       binding.animeListLayout.dimOverlayView.animate()
         .alpha(1f)
         .apply {

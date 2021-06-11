@@ -28,7 +28,7 @@
         android:layout_marginTop="@dimen/margin_bottom_bottom_sheet_handle"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/handle"
+        app:layout_constraintTop_toBottomOf="@id/indicator_v"
         />
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_marginTop="@dimen/margin_bottom_bottom_sheet_handle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/details_cover_iv"
-        app:layout_constraintTop_toBottomOf="@id/handle"
+        app:layout_constraintTop_toBottomOf="@id/indicator_v"
         />
 
     <TextView
@@ -78,7 +78,7 @@
         />
 
     <View
-        android:id="@+id/handle"
+        android:id="@+id/indicator_v"
         android:layout_width="@dimen/width_bottom_sheet_handle"
         android:layout_height="@dimen/height_bottom_sheet_handle"
         android:background="@drawable/bottom_sheet_handle"
