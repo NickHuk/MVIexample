@@ -11,6 +11,6 @@ open class Anime(
   val duration: Int? = null, //minutes in general
   val coverImage: String? = null,
   val bannerImage: String? = null,
-  override val timeOfBirth: Long,
-  override val timeToStale: Long
+  override val timeOfBirth: Long = 0,
+  override val timeToStale: Long = 0
 ) : Dirtyable

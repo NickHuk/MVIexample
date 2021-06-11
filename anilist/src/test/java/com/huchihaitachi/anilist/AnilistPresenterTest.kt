@@ -11,70 +11,75 @@ import com.huchihaitachi.domain.Page
 import com.huchihaitachi.usecase.GetStringResourceUseCase
 import com.huchihaitachi.usecase.LoadAnimeUseCase
 import com.huchihaitachi.usecase.LoadPageUseCase
+import com.huchihaitachi.usecase.RefreshPageUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.verify
-import io.mockk.verifyAll
-import io.mockk.verifySequence
+import io.mockk.just
+import io.mockk.runs
+import io.mockk.verifyOrder
+import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.schedulers.TestScheduler
 import io.reactivex.subjects.PublishSubject
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class AnilistPresenterTest {
-  @MockK private lateinit var loadPageUseCase: LoadPageUseCase
-  @MockK private lateinit var loadAnimeUseCase: LoadAnimeUseCase
-  @MockK private lateinit var getStringResourceUseCase: GetStringResourceUseCase
+  @MockK private lateinit var loadPage: LoadPageUseCase
+  @MockK private lateinit var refreshPage: RefreshPageUseCase
+  @MockK private lateinit var loadAnime: LoadAnimeUseCase
+  @MockK private lateinit var getStringResource: GetStringResourceUseCase
   @MockK private lateinit var anilistView: AnilistView
-  @MockK private lateinit var  rxSchedulers: RxSchedulers
+  @MockK private lateinit var rxSchedulers: RxSchedulers
+  private lateinit var anime: List<Anime>
+  private lateinit var testScheduler: Scheduler
 
   @Before
   fun setup() {
     MockKAnnotations.init(this)
-    mockIntents()
+    setupSchedulers()
+    setupView()
+    anime = listOf(Anime(1), Anime(2), Anime(3), Anime(4), Anime(5), Anime(6))
   }
 
   @Test
   fun `load first page test`() {
-    val initialState = AnilistViewState()
-    val anilistPresenter = AnilistPresenter(
-      loadPageUseCase,
-      loadAnimeUseCase,
-      getStringResourceUseCase,
-      AnilistViewState(),
-      rxSchedulers
+    val initialState = AnilistViewState(pageState = PageState(null, 0, true))
+    val presenter = AnilistPresenter(
+      loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
     )
-    val anime = listOf(
-      Anime(1), Anime(2), Anime(3), Anime(4), Anime(1), Anime(2), Anime(3), Anime(4)
-    )
-    val testScheduler = TestScheduler()
-    every { rxSchedulers.io } returns testScheduler
-    every { rxSchedulers.ui } returns testScheduler
-    anilistPresenter.bind(anilistView)
     val loadAnimePageMock: PublishSubject<Unit> = PublishSubject.create()
     every { anilistView.loadAnimePage } returns loadAnimePageMock
-    every { loadPageUseCase(any(), any()) } returns Single.just(Page(8, 1, true, anime))
-    every { anilistView.render(any()) } returns testScheduler.advanceTimeBy(100L, MILLISECONDS)
-    val expectedResult = AnilistViewState(PAGE, null, PageState(anime, 1, true), null)
-    anilistPresenter.bindIntents()
-    testScheduler.advanceTimeBy(10000L, TimeUnit.MILLISECONDS)
+    every { anilistView.reload } returns PublishSubject.create()
+    every { anilistView.showDetails } returns PublishSubject.create()
+    every { anilistView.hideDetails } returns PublishSubject.create()
+    every { loadPage(any(), any()) } returns Single.just(
+      Page(1, 1, true, anime, 0, 0)
+    )
+    presenter.bind(anilistView)
+    presenter.bindIntents()
+    val expectedInitial = AnilistViewState(pageState = PageState(null, 0, true))
+    val expectedLoading = AnilistViewState(
+      loading = PAGE,
+      pageState = PageState(null, 0, true),
+    )
+    val expectedResult = AnilistViewState(pageState = PageState(anime, 1, true))
     loadAnimePageMock.onNext(Unit)
-    verifySequence {
-      anilistView.render(initialState)
+    verifyOrder {
+      anilistView.render(expectedInitial)
+      anilistView.render(expectedLoading)
       anilistView.render(expectedResult)
     }
   }
 
-  private fun mockIntents() {
-    every { anilistView.loadAnimePage } returns PublishSubject.create()
-    every { anilistView.reload } returns PublishSubject.create()
-    every { anilistView.showDetails } returns PublishSubject.create()
-    every { anilistView.hideDetails } returns PublishSubject.create()
+  private fun setupSchedulers() {
+    testScheduler = Schedulers.trampoline()
+    every { rxSchedulers.io } answers { testScheduler }
+    every { rxSchedulers.ui } answers { testScheduler }
+  }
+
+  private fun setupView() {
+    every { anilistView.render(any()) } just runs
   }
 }
