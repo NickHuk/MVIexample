@@ -26,14 +26,14 @@ class AnilistPresenter @Inject constructor(
   private val refreshPageUseCase: RefreshPageUseCase,
   private val loadAnimeUseCase: LoadAnimeUseCase,
   private val getStringResourceUseCase: GetStringResourceUseCase,
-  anilistViewState: AnilistViewState,
-  rxSchedulers: RxSchedulers,
-) : BasePresenter<AnilistView, AnilistViewState>(anilistViewState, rxSchedulers) {
+  initialViewState: AnilistViewState,
+  rxSchedulers: RxSchedulers
+) : BasePresenter<AnilistView, AnilistViewState>(initialViewState, rxSchedulers) {
 
   override fun bindIntents() {
     view?.let { view ->
       // load page
-      val loadPageIntent = view.loadAnimePage
+      val loadPageIntent = view.loadPage
         .observeOn(rxSchedulers.io)
         .filter { _ ->
           state.pageState?.hasNextPage == true
@@ -43,7 +43,7 @@ class AnilistPresenter @Inject constructor(
         }
         .flatMap { _ -> loadPage(state.pageState?.currentPage!! + 1) }
       //reload
-      val reloadIntent = view.reload
+      val reloadIntent = view.refresh
         .observeOn(rxSchedulers.io)
         .filter { _ -> state.loading != RELOAD }
         .flatMap { unit -> refreshPage() }

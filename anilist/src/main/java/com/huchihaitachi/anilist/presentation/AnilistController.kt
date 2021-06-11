@@ -2,9 +2,7 @@ package com.huchihaitachi.anilist.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,10 +34,10 @@ class AnilistController : Controller(), AnilistView {
   private val binding: ControllerAnilistBinding
     get() = _binding!!
   private val _loadAnimePage: PublishSubject<Unit> = PublishSubject.create()
-  override val loadAnimePage: Observable<Unit>
+  override val loadPage: Observable<Unit>
     get() = _loadAnimePage
   private val _reload: PublishSubject<Unit> = PublishSubject.create()
-  override val reload: Observable<Unit>
+  override val refresh: Observable<Unit>
     get() = _reload
   private val _showDetails: PublishSubject<Int> = PublishSubject.create()
   override val showDetails: Observable<Int>

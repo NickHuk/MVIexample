@@ -4,6 +4,7 @@ import com.huchihaitachi.anilist.presentation.AnilistPresenter
 import com.huchihaitachi.anilist.presentation.AnilistView
 import com.huchihaitachi.anilist.presentation.AnilistViewState
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.base.RxSchedulers
 import com.huchihaitachi.domain.Anime
@@ -30,7 +31,7 @@ class AnilistPresenterTest {
   @MockK private lateinit var refreshPage: RefreshPageUseCase
   @MockK private lateinit var loadAnime: LoadAnimeUseCase
   @MockK private lateinit var getStringResource: GetStringResourceUseCase
-  @MockK private lateinit var anilistView: AnilistView
+  @MockK private lateinit var view: AnilistView
   @MockK private lateinit var rxSchedulers: RxSchedulers
   private lateinit var anime: List<Anime>
   private lateinit var testScheduler: Scheduler
@@ -49,15 +50,12 @@ class AnilistPresenterTest {
     val presenter = AnilistPresenter(
       loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
     )
-    val loadAnimePageMock: PublishSubject<Unit> = PublishSubject.create()
-    every { anilistView.loadAnimePage } returns loadAnimePageMock
-    every { anilistView.reload } returns PublishSubject.create()
-    every { anilistView.showDetails } returns PublishSubject.create()
-    every { anilistView.hideDetails } returns PublishSubject.create()
+    val loadPageIntentMock: PublishSubject<Unit> = PublishSubject.create()
+    mockIntents(loadPageIntent = loadPageIntentMock)
     every { loadPage(any(), any()) } returns Single.just(
-      Page(1, 1, true, anime, 0, 0)
+      Page(1, anime.size, true, anime, 0, 0)
     )
-    presenter.bind(anilistView)
+    presenter.bind(view)
     presenter.bindIntents()
     val expectedInitial = AnilistViewState(pageState = PageState(null, 0, true))
     val expectedLoading = AnilistViewState(
@@ -65,12 +63,54 @@ class AnilistPresenterTest {
       pageState = PageState(null, 0, true),
     )
     val expectedResult = AnilistViewState(pageState = PageState(anime, 1, true))
-    loadAnimePageMock.onNext(Unit)
+    loadPageIntentMock.onNext(Unit)
     verifyOrder {
-      anilistView.render(expectedInitial)
-      anilistView.render(expectedLoading)
-      anilistView.render(expectedResult)
+      view.render(expectedInitial)
+      view.render(expectedLoading)
+      view.render(expectedResult)
     }
+  }
+
+  @Test
+  fun `reload test`() {
+    val initialState = AnilistViewState(pageState = PageState(anime, 1, true))
+    val presenter = AnilistPresenter(
+      loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
+    )
+    val refreshIntentMock: PublishSubject<Unit> = PublishSubject.create()
+    mockIntents(refreshIntent = refreshIntentMock)
+    val freshAnime = listOf(
+      Anime(11), Anime(21), Anime(31), Anime(41), Anime(51), Anime(61)
+    )
+    every { refreshPage(any()) } returns Single.just(
+      Page(1, freshAnime.size, true, freshAnime, 0, 0)
+    )
+    presenter.bind(view)
+    presenter.bindIntents()
+    val expectedInitial = AnilistViewState(pageState = PageState(anime, 1, true))
+    val expectedLoading = AnilistViewState(
+      loading = RELOAD,
+      pageState = PageState(anime, 1, true),
+    )
+    val expectedResult = AnilistViewState(pageState = PageState(freshAnime, 1, true))
+    refreshIntentMock.onNext(Unit)
+    verifyOrder {
+      view.render(expectedInitial)
+      view.render(expectedLoading)
+      view.render(expectedResult)
+    }
+  }
+
+  private fun mockIntents(
+    loadPageIntent: PublishSubject<Unit> = PublishSubject.create(),
+    refreshIntent: PublishSubject<Unit> = PublishSubject.create(),
+    showDetailsIntent: PublishSubject<Int> = PublishSubject.create(),
+    hideDetailsIntent: PublishSubject<Unit> = PublishSubject.create()
+  ) {
+    every { view.loadPage } returns loadPageIntent
+    every { view.refresh } returns refreshIntent
+    every { view.showDetails } returns showDetailsIntent
+    every { view.hideDetails } returns hideDetailsIntent
   }
 
   private fun setupSchedulers() {
@@ -80,6 +120,6 @@ class AnilistPresenterTest {
   }
 
   private fun setupView() {
-    every { anilistView.render(any()) } just runs
+    every { view.render(any()) } just runs
   }
 }
