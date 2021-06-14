@@ -5,7 +5,7 @@ import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.di.scope.AnilistScope
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.NOT_LOADING
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.REFRESH
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.base.BasePresenter
 import com.huchihaitachi.base.RxSchedulers
@@ -37,15 +37,15 @@ class AnilistPresenter @Inject constructor(
         .observeOn(rxSchedulers.io)
         .filter { _ ->
           state.pageState?.hasNextPage == true
-            && state.loading != RELOAD
+            && state.loading != REFRESH
             && state.loading != PAGE
             && state.loadingEnabled
         }
         .flatMap { _ -> loadPage(state.pageState?.currentPage!! + 1) }
-      //reload
-      val reloadIntent = view.refresh
+      //refresh
+      val refreshIntent = view.refresh
         .observeOn(rxSchedulers.io)
-        .filter { _ -> state.loading != RELOAD }
+        .filter { _ -> state.loading != REFRESH }
         .flatMap { unit -> refreshPage() }
       //details
       val detailsIntent = view.showDetails
@@ -55,7 +55,12 @@ class AnilistPresenter @Inject constructor(
             .toObservable()
             .map { details ->
               AnilistPartialState(
-                details = details
+                state.loading,
+                details,
+                state.pageState?.copy(null),
+                state.error,
+                state.loadingEnabled,
+                state.backoff
               )
             }
             .onErrorReturn { throwable ->
@@ -67,12 +72,13 @@ class AnilistPresenter @Inject constructor(
               )
             }
         }
+      //hide details
       val hideDetailsIntent = view.hideDetails
         .filter { state.loading == NOT_LOADING }
         .map {
           AnilistPartialState(error = state.error)
         }
-      val intents = Observable.merge(loadPageIntent, reloadIntent, detailsIntent, hideDetailsIntent)
+      val intents = Observable.merge(loadPageIntent, refreshIntent, detailsIntent, hideDetailsIntent)
       intents.scan(state, ::animeStateReducer)
         .subscribe { s ->
           state = s
@@ -122,7 +128,7 @@ class AnilistPresenter @Inject constructor(
           pageState = PageState(page.anime, page.currentPage, page.hasNextPage)
         )
       }
-      .startWith(AnilistPartialState(loading = RELOAD))
+      .startWith(AnilistPartialState(loading = REFRESH))
       .onErrorReturn { throwable ->
         AnilistPartialState(
           error = when(throwable) {
@@ -148,11 +154,15 @@ class AnilistPresenter @Inject constructor(
           changes.loadingEnabled,
           changes.backoff
         )
-        RELOAD ->
+        REFRESH ->
           previousState.copy(
             changes.loading,
             changes.details,
-            changes.pageState?.copy(),
+            if(changes.details == null) {
+              changes.pageState?.copy()
+            } else {
+              previousState.pageState?.copy()
+            },
             changes.error,
             changes.loadingEnabled,
             changes.backoff

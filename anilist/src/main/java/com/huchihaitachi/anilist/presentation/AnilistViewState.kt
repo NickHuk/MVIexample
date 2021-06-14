@@ -21,7 +21,7 @@ data class AnilistViewState(
 
   enum class LoadingType {
     PAGE,
-    RELOAD,
+    REFRESH,
     NOT_LOADING
   }
 }
