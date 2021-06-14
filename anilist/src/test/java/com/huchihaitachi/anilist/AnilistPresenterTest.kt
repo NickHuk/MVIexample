@@ -4,11 +4,13 @@ import com.huchihaitachi.anilist.presentation.AnilistPresenter
 import com.huchihaitachi.anilist.presentation.AnilistView
 import com.huchihaitachi.anilist.presentation.AnilistViewState
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.REFRESH
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
 import com.huchihaitachi.base.RxSchedulers
 import com.huchihaitachi.domain.Anime
 import com.huchihaitachi.domain.Page
+import com.huchihaitachi.domain.Season.FALL
+import com.huchihaitachi.domain.Type
 import com.huchihaitachi.usecase.GetStringResourceUseCase
 import com.huchihaitachi.usecase.LoadAnimeUseCase
 import com.huchihaitachi.usecase.LoadPageUseCase
@@ -72,7 +74,7 @@ class AnilistPresenterTest {
   }
 
   @Test
-  fun `reload test`() {
+  fun `refresh test`() {
     val initialState = AnilistViewState(pageState = PageState(anime, 1, true))
     val presenter = AnilistPresenter(
       loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
@@ -89,7 +91,7 @@ class AnilistPresenterTest {
     presenter.bindIntents()
     val expectedInitial = AnilistViewState(pageState = PageState(anime, 1, true))
     val expectedLoading = AnilistViewState(
-      loading = RELOAD,
+      loading = REFRESH,
       pageState = PageState(anime, 1, true),
     )
     val expectedResult = AnilistViewState(pageState = PageState(freshAnime, 1, true))
@@ -100,6 +102,53 @@ class AnilistPresenterTest {
       view.render(expectedResult)
     }
   }
+
+  @Test
+  fun `show details while refreshing`() {
+    val initialState = AnilistViewState(
+      loading = REFRESH,
+      pageState = PageState(anime, 1, true)
+    )
+    val presenter = AnilistPresenter(
+      loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
+    )
+    val showDetailsIntentMock: PublishSubject<Int> = PublishSubject.create()
+    mockIntents(showDetailsIntent = showDetailsIntentMock)
+    val animeDetails = Anime(
+      1,
+      "title",
+      Type.ANIME,
+      "test description",
+      FALL,
+      1998,
+      22,
+      17,
+      "image/test/url",
+      "banner/test/url",
+      0,
+      0
+    )
+    val expectedDetails = animeDetails.copy()
+    every { loadAnime(any()) } returns Single.just(animeDetails)
+    presenter.bind(view)
+    presenter.bindIntents()
+    showDetailsIntentMock.onNext(1)
+    val expectedInitial = AnilistViewState(
+      loading = REFRESH,
+      pageState = PageState(anime, 1, true)
+    )
+    val expectedResult = AnilistViewState(
+      REFRESH,
+      expectedDetails,
+      PageState(anime, 1, true)
+    )
+    verifyOrder {
+      view.render(expectedInitial)
+      view.render(expectedResult)
+    }
+  }
+
+  //TODO: test backoff
 
   private fun mockIntents(
     loadPageIntent: PublishSubject<Unit> = PublishSubject.create(),
