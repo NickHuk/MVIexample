@@ -16,6 +16,7 @@ import com.huchihaitachi.usecase.LoadPageUseCase
 import com.huchihaitachi.usecase.RefreshPageUseCase
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.pow
@@ -78,11 +79,11 @@ class AnilistPresenter @Inject constructor(
         .map {
           AnilistPartialState(error = state.error)
         }
+      val hotState: PublishSubject<AnilistViewState> = PublishSubject.create()
       val intents = Observable.merge(loadPageIntent, refreshIntent, detailsIntent, hideDetailsIntent)
       intents.scan(state, ::animeStateReducer)
-        .subscribe { s ->
-          state = s
-        }
+        .subscribe(hotState)
+      hotState.subscribe { s -> state = s }
         .let(disposables::add)
     }
   }
