@@ -31,7 +31,11 @@ import io.reactivex.schedulers.TestScheduler
 import io.reactivex.subjects.PublishSubject
 import org.junit.Before
 import org.junit.Test
+import java.util.Collections.addAll
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.HOURS
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
 
 class AnilistPresenterTest {
   @MockK private lateinit var loadPage: LoadPageUseCase
@@ -42,8 +46,7 @@ class AnilistPresenterTest {
   @MockK private lateinit var rxSchedulers: RxSchedulers
   private lateinit var anime: List<Anime>
   private lateinit var trampoline: Scheduler
-  private lateinit var testSchedulerIo: TestScheduler
-  private lateinit var testSchedulerUi: TestScheduler
+  private lateinit var testScheduler: TestScheduler
 
   @Before
   fun setup() {
@@ -162,7 +165,8 @@ class AnilistPresenterTest {
     setupTrampoline()
     val initialState = AnilistViewState(
       loading = NOT_LOADING,
-      pageState = PageState(anime, 1, true))
+      pageState = PageState(anime, 1, true)
+    )
     every { getStringResource(R.string.no_connection) } returns "No connection"
     val presenter = AnilistPresenter(
       loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
@@ -240,6 +244,73 @@ class AnilistPresenterTest {
     verify(exactly = 5) { view.render(any()) }
   }
 
+  @Test
+  fun `load after backoff`() {
+    setupTestScheduler()
+    val initialState = AnilistViewState(
+      loading = NOT_LOADING,
+      pageState = PageState(anime, 1, true)
+    )
+    every { getStringResource(R.string.no_connection) } returns "No connection"
+    val presenter = AnilistPresenter(
+      loadPage, refreshPage, loadAnime, getStringResource, initialState, rxSchedulers
+    )
+    val loadPageIntentMock: PublishSubject<Unit> = PublishSubject.create()
+    mockIntents(loadPageIntent = loadPageIntentMock)
+    every { loadPage(any(), any()) } returns Single.error(ApolloNetworkException("no connection"))
+    presenter.bind(view)
+    presenter.bindIntents()
+    loadPageIntentMock.onNext(Unit)
+    testScheduler.advanceTimeBy(3000L, MILLISECONDS)
+    val moreAnime = listOf(
+      Anime(11), Anime(21), Anime(31), Anime(41), Anime(51), Anime(61)
+    )
+    every { loadPage(any(), any()) } returns Single.just(
+      Page(2, moreAnime.size, true, moreAnime, 0,0)
+    )
+    loadPageIntentMock.onNext(Unit)
+    testScheduler.triggerActions()
+    val expectedFourthState = AnilistViewState(
+      pageState = PageState(anime, 1, true),
+      backoff = 1
+    )
+    val expectedFifthState = AnilistViewState(
+      PAGE,
+      pageState = PageState(anime, 1, true),
+      backoff = 1
+    )
+    val expectedAnime = listOf(
+      Anime(1), Anime(2), Anime(3), Anime(4), Anime(5), Anime(6), Anime(11),
+      Anime(21), Anime(31), Anime(41), Anime(51), Anime(61)
+    )
+    val expectedSixthState = AnilistViewState(
+      pageState = PageState(expectedAnime, 2, true),
+    )
+    val expectedInitial = AnilistViewState(
+      loading = NOT_LOADING,
+      pageState = PageState(anime, 1, true)
+    )
+    val expectedSecondState = AnilistViewState(
+      loading = PAGE,
+      pageState = PageState(anime, 1, true)
+    )
+    val expectedThirdState = AnilistViewState(
+      pageState = PageState(anime, 1, true),
+      error = "No connection",
+      loadingEnabled = false,
+      backoff = 1
+    )
+    verifyOrder {
+      view.render(expectedInitial)
+      view.render(expectedSecondState)
+      view.render(expectedThirdState)
+      view.render(expectedFourthState)
+      view.render(expectedFifthState)
+      view.render(expectedSixthState)
+    }
+
+  }
+
   private fun mockIntents(
     loadPageIntent: PublishSubject<Unit> = PublishSubject.create(),
     refreshIntent: PublishSubject<Unit> = PublishSubject.create(),
@@ -259,9 +330,10 @@ class AnilistPresenterTest {
   }
 
   private fun setupTestScheduler() {
-    testSchedulerIo = TestScheduler()
-    every { rxSchedulers.io } answers { testSchedulerIo }
-    every { rxSchedulers.ui } answers { testSchedulerUi }
+    testScheduler = TestScheduler()
+    every { rxSchedulers.io } answers { testScheduler }
+    every { rxSchedulers.computation } answers { testScheduler }
+    every { rxSchedulers.ui } answers { testScheduler }
   }
 
   private fun setupView() {
