@@ -104,7 +104,8 @@ class AnilistPresenter @Inject constructor(
           } else {
             MAX_BACKOFF
           },
-          TimeUnit.MILLISECONDS
+          TimeUnit.MILLISECONDS,
+          rxSchedulers.computation
         )
           .map { state.copy(
             error = null,

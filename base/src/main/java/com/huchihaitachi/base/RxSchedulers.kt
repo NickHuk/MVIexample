@@ -12,6 +12,9 @@ class RxSchedulers @Inject constructor() {
   val io: Scheduler
     get() = Schedulers.io()
 
+  val computation: Scheduler
+    get() = Schedulers.computation()
+
   val ui: Scheduler
     get() = AndroidSchedulers.mainThread()
 }
