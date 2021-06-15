@@ -2,9 +2,7 @@ package com.huchihaitachi.anilist.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,7 +15,7 @@ import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.databinding.ControllerAnilistBinding
 import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.REFRESH
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
 import com.huchihaitachi.base.domain.localized
 import com.huchihaitachi.base.domain.stringRes
@@ -36,11 +34,11 @@ class AnilistController : Controller(), AnilistView {
   private val binding: ControllerAnilistBinding
     get() = _binding!!
   private val _loadAnimePage: PublishSubject<Unit> = PublishSubject.create()
-  override val loadAnimePage: Observable<Unit>
+  override val loadPage: Observable<Unit>
     get() = _loadAnimePage
-  private val _reload: PublishSubject<Unit> = PublishSubject.create()
-  override val reload: Observable<Unit>
-    get() = _reload
+  private val _refresh: PublishSubject<Unit> = PublishSubject.create()
+  override val refresh: Observable<Unit>
+    get() = _refresh
   private val _showDetails: PublishSubject<Int> = PublishSubject.create()
   override val showDetails: Observable<Int>
     get() = _showDetails
@@ -55,7 +53,7 @@ class AnilistController : Controller(), AnilistView {
     binding.animeListL.pageLoadingPb.visible = state.loading == PAGE
     binding.animeListL.totalFooterTv.visible = state.loading != PAGE
     binding.animeListL.totalFooterTv.text = resources?.getString(R.string.total, state.pageState?.anime?.size)
-    binding.animeListL.animeSrl.isRefreshing = state.loading == RELOAD
+    binding.animeListL.animeSrl.isRefreshing = state.loading == REFRESH
     binding.animeListL.errorFooterTv.apply {
       visible = state.error != null
       state.error?.let { text = it }
@@ -102,7 +100,7 @@ class AnilistController : Controller(), AnilistView {
 
   private fun setupSwipeToRefresh() {
     binding.animeListL.animeSrl.setOnRefreshListener {
-      _reload.onNext(Unit)
+      _refresh.onNext(Unit)
     }
   }
 
