@@ -26,7 +26,7 @@
       >
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/anime_erv"
+        android:id="@+id/anime_rv"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         tools:listitem="@layout/item_anime"

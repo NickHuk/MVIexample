@@ -68,22 +68,16 @@ class AnilistController : Controller(), AnilistView {
       state.error?.let { text = it }
     }
     binding.animeListLayout.dimOverlayView.isClickable = state.details != null
+    binding.animeListLayout.dimOverlayView.animate()
+      .alpha(if(state.details == null) 0f else 1f)
+      .apply {
+        duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
+        interpolator = AccelerateDecelerateInterpolator()
+      }
     bottomSheetBehavior.state = if (state.details == null) {
-      binding.animeListLayout.dimOverlayView.animate()
-        .alpha(0f)
-        .apply {
-          duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
-          interpolator = AccelerateDecelerateInterpolator()
-        }
       BottomSheetBehavior.STATE_COLLAPSED
     } else {
       bindDetailsData(state.details)
-      binding.animeListLayout.dimOverlayView.animate()
-        .alpha(1f)
-        .apply {
-          duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
-          interpolator = AccelerateDecelerateInterpolator()
-        }
       BottomSheetBehavior.STATE_EXPANDED
     }
   }
@@ -126,7 +120,7 @@ class AnilistController : Controller(), AnilistView {
     animeEpoxyController = AnimeEpoxyController { details ->
       _showDetails.onNext(details)
     }
-    binding.animeListLayout.animeErv.apply {
+    binding.animeListLayout.animeRv.apply {
       layoutManager = GridLayoutManager(
         context,
         resources.getInteger(R.integer.anime_span_count),
@@ -159,9 +153,7 @@ class AnilistController : Controller(), AnilistView {
 
           override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if (!recyclerView.canScrollVertically(DIRECTION_DOWN)
-              && newState == SCROLL_STATE_DRAGGING
-            ) { //can scroll down
+            if (!recyclerView.canScrollVertically(DIRECTION_DOWN) && newState == SCROLL_STATE_DRAGGING) { //can scroll down
               _loadAnimePage.onNext(Unit)
             }
           }
