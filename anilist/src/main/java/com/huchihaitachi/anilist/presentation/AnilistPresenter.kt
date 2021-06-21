@@ -125,7 +125,7 @@ class AnilistPresenter @Inject constructor(
       .startWith(AnilistPartialState(loading = RELOAD))
       .onErrorReturn { throwable ->
         AnilistPartialState(
-          error = when(throwable) {
+          error = when (throwable) {
             is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
             else -> throwable.message
           }

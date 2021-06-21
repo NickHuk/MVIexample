@@ -7,4 +7,4 @@ open class Page(
   val anime: List<Anime>?,
   override val timeOfBirth: Long,
   override val timeToStale: Long,
-): Dirtyable
+) : Dirtyable

@@ -12,5 +12,5 @@ class ResourcesDataSourceImpl @Inject constructor(
 ) : ResourcesDataSource {
 
   override fun getString(@StringRes resId: Int, vararg params: Any): String =
-    resources.getString(resId, params)
+    resources.getString(resId, *params)
 }

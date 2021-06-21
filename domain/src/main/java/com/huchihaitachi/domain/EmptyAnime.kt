@@ -1,6 +1,6 @@
 package com.huchihaitachi.domain
 
-object EmptyAnime: Anime(
+object EmptyAnime : Anime(
   0,
   null,
   null,

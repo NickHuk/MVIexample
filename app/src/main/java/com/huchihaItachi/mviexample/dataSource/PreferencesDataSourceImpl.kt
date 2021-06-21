@@ -14,14 +14,14 @@ class PreferencesDataSourceImpl @Inject constructor(
   override var updateDeadline: Long
     get() = sharedPreferences.getLong(UPDATE_DEADLINE, 0L)
     set(value) = sharedPreferences.edit {
-        putLong(UPDATE_DEADLINE,value)
+      putLong(UPDATE_DEADLINE, value)
     }
 
   override var lastLoadedPage: Int
     get() = sharedPreferences.getInt(LAST_LOADED_PAGE, 0)
     set(value) = sharedPreferences.edit {
-    putInt(LAST_LOADED_PAGE ,value)
-  }
+      putInt(LAST_LOADED_PAGE, value)
+    }
 
   override var hasNextPage: Boolean
     get() = sharedPreferences.getBoolean(HAS_NEXT_PAGE, true)

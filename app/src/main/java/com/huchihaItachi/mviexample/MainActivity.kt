@@ -11,9 +11,9 @@ import com.huchihaItachi.mviexample.navigation.Navigator
 import com.huchihaItachi.mviexample.navigation.RootFlowCoordinator
 import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
 import com.huchihaitachi.anilist.di.component.AnilistSubcomponent
-import com.huchihaitachi.login.presentation.LoginController
 import com.huchihaitachi.login.di.LoginSubcomponentProvider
 import com.huchihaitachi.login.di.component.LoginSubcomponent
+import com.huchihaitachi.login.presentation.LoginController
 import com.huchihaitachi.loginwebview.di.LoginWebSubcomponentProvider
 import com.huchihaitachi.loginwebview.di.component.LoginWebSubcomponent
 import javax.inject.Inject

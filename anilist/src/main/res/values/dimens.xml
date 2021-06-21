@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <dimen name="height_anime_card">104dp</dimen>
+  <dimen name="width_anime_card">180dp</dimen>
+  <dimen name="height_anime_card">280dp</dimen>
   <dimen name="padding_anime_card">4dp</dimen>
-  <dimen name="height_thumbnail">96dp</dimen>
-  <dimen name="width_thumbnail">72dp</dimen>
+  <dimen name="width_anime_list">372dp</dimen>
+  <dimen name="height_thumbnail">240dp</dimen>
+  <dimen name="width_thumbnail">180dp</dimen>
   <dimen name="height_page_loading_pb">24dp</dimen>
   <dimen name="width_details_cover">96dp</dimen>
   <dimen name="height_details_cover">128dp</dimen>
@@ -14,4 +16,14 @@
   <dimen name="margin_end_details_card">0dp</dimen>
   <dimen name="margin_bottom_details_card">32dp</dimen>
   <dimen name="radius_details_card">12dp</dimen>
+  <dimen name="margin_end_details_cover">6dp</dimen>
+  <dimen name="margin_start_item_title">12dp</dimen>
+  <dimen name="margin_end_item_title">12dp</dimen>
+  <dimen name="margin_bottom_item_title">8dp</dimen>
+  <dimen name="width_anime_divider">6dp</dimen>
+  <dimen name="height_anime_divider">8dp</dimen>
+  <dimen name="width_bottom_sheet_handle">48dp</dimen>
+  <dimen name="height_bottom_sheet_handle">4dp</dimen>
+  <dimen name="radius_bottom_sheet_handle">2dp</dimen>
+  <dimen name="margin_bottom_bottom_sheet_handle">16dp</dimen>
 </resources>

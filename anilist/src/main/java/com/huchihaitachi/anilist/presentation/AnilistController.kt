@@ -1,12 +1,14 @@
 package com.huchihaitachi.anilist.presentation
 
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.core.text.HtmlCompat
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import com.bluelinelabs.conductor.Controller
@@ -19,17 +21,21 @@ import com.huchihaitachi.anilist.di.AnilistSubcomponentProvider
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.RELOAD
 import com.huchihaitachi.anilist.presentation.animeList.AnimeEpoxyController
-import com.huchihaitachi.base.domain.localized
+import com.huchihaitachi.anilist.presentation.animeList.GridDividerItemDecoration
+import com.huchihaitachi.base.utils.SpanFactory
 import com.huchihaitachi.base.domain.stringRes
+import com.huchihaitachi.base.setTextAndHighlight
 import com.huchihaitachi.base.setUrl
 import com.huchihaitachi.base.visible
 import com.huchihaitachi.domain.Anime
+import com.huchihaitachi.domain.Type
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 class AnilistController : Controller(), AnilistView {
   @Inject lateinit var presenter: AnilistPresenter
+  @Inject lateinit var spanFactory: SpanFactory
   lateinit var animeEpoxyController: AnimeEpoxyController
 
   private var _binding: ControllerAnilistBinding? = null
@@ -52,23 +58,26 @@ class AnilistController : Controller(), AnilistView {
 
   override fun render(state: AnilistViewState) {
     state.pageState?.anime?.let(animeEpoxyController::setData)
-    binding.animeListL.pageLoadingPb.visible = state.loading == PAGE
-    binding.animeListL.totalFooterTv.visible = state.loading != PAGE
-    binding.animeListL.totalFooterTv.text = resources?.getString(R.string.total, state.pageState?.anime?.size)
-    binding.animeListL.animeSrl.isRefreshing = state.loading == RELOAD
-    binding.animeListL.errorFooterTv.apply {
+    binding.animeListLayout.pageLoadingPb.visible = state.loading == PAGE
+    binding.animeListLayout.totalFooterTv.visible = state.loading != PAGE
+    binding.animeListLayout.totalFooterTv.text =
+      resources?.getString(R.string.total, state.pageState?.anime?.size)
+    binding.animeListLayout.animeSrl.isRefreshing = state.loading == RELOAD
+    binding.animeListLayout.errorFooterTv.apply {
       visible = state.error != null
       state.error?.let { text = it }
     }
-    bottomSheetBehavior.state = if(state.details == null) {
-      binding.animeListL.animeErv.isEnabled = true
-      binding.animeListL.dimOverlayView.visible = false
+    binding.animeListLayout.dimOverlayView.isClickable = state.details != null
+    binding.animeListLayout.dimOverlayView.animate()
+      .alpha(if(state.details == null) 0f else 1f)
+      .apply {
+        duration = resources?.getInteger(R.integer.bottom_sheet_fade_duration)?.toLong() ?: 0L
+        interpolator = AccelerateDecelerateInterpolator()
+      }
+    bottomSheetBehavior.state = if (state.details == null) {
       BottomSheetBehavior.STATE_COLLAPSED
-    }
-    else {
+    } else {
       bindDetailsData(state.details)
-      binding.animeListL.animeErv.isEnabled = false
-      binding.animeListL.dimOverlayView.visible = true
       BottomSheetBehavior.STATE_EXPANDED
     }
   }
@@ -97,11 +106,12 @@ class AnilistController : Controller(), AnilistView {
   private fun setupViews() {
     setupRecyclerView()
     setupSwipeToRefresh()
+    setupContentOverlay()
     setupBottomSheet()
   }
 
   private fun setupSwipeToRefresh() {
-    binding.animeListL.animeSrl.setOnRefreshListener {
+    binding.animeListLayout.animeSrl.setOnRefreshListener {
       _reload.onNext(Unit)
     }
   }
@@ -110,18 +120,30 @@ class AnilistController : Controller(), AnilistView {
     animeEpoxyController = AnimeEpoxyController { details ->
       _showDetails.onNext(details)
     }
-    binding.animeListL.animeErv.apply {
-      layoutManager = LinearLayoutManager(context)
+    binding.animeListLayout.animeRv.apply {
+      layoutManager = GridLayoutManager(
+        context,
+        resources.getInteger(R.integer.anime_span_count),
+        GridLayoutManager.VERTICAL,
+        false
+      )
+      addItemDecoration(
+        GridDividerItemDecoration(
+          resources.getDimension(R.dimen.width_anime_divider),
+          resources.getDimension(R.dimen.height_anime_divider)
+        )
+      )
       adapter = animeEpoxyController.adapter
       addOnScrollListener(
-        object: RecyclerView.OnScrollListener() {
+        object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            (layoutManager as LinearLayoutManager).let { linearLayoutManager ->
-              val totalItemsCount = linearLayoutManager.itemCount
-              val lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition()
-              if(lastVisibleItemPosition != RecyclerView.NO_POSITION
-                && lastVisibleItemPosition + ANIME_ITEMS_RESERVE >= totalItemsCount) {
+            (layoutManager as GridLayoutManager).let { gridLayoutManager ->
+              val totalItemsCount = gridLayoutManager.itemCount
+              val lastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition()
+              if (lastVisibleItemPosition != RecyclerView.NO_POSITION
+                && lastVisibleItemPosition + ANIME_ITEMS_RESERVE >= totalItemsCount
+              ) {
                 _loadAnimePage.onNext(Unit)
               } else {
                 _hideDetails.onNext(Unit)
@@ -131,8 +153,7 @@ class AnilistController : Controller(), AnilistView {
 
           override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if(!recyclerView.canScrollVertically(DIRECTION_DOWN)
-              && newState == SCROLL_STATE_DRAGGING) { //can scroll down
+            if (!recyclerView.canScrollVertically(DIRECTION_DOWN) && newState == SCROLL_STATE_DRAGGING) { //can scroll down
               _loadAnimePage.onNext(Unit)
             }
           }
@@ -143,14 +164,15 @@ class AnilistController : Controller(), AnilistView {
 
   private fun setupBottomSheet() {
 
-    bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsL.root)
+    bottomSheetBehavior = BottomSheetBehavior.from(binding.detailsLayout.root)
     bottomSheetBehavior.addBottomSheetCallback(
       object : BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-          when(newState) {
+          when (newState) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
-              _hideDetails.onNext(Unit) }
+              _hideDetails.onNext(Unit)
+            }
           }
         }
 
@@ -160,34 +182,60 @@ class AnilistController : Controller(), AnilistView {
     )
   }
 
+  private fun setupContentOverlay() {
+    binding.animeListLayout.dimOverlayView.setOnClickListener {
+      _hideDetails.onNext(Unit)
+    }
+  }
+
   private fun bindDetailsData(details: Anime) {
-    binding.detailsL.let { detailsBinding ->
-      details.coverImage?.let(detailsBinding.detailsCoverIv::setUrl)
-      details.title?.let { title ->
-        detailsBinding.titleTv.text = resources?.getString(
+    resources?.let { res ->
+      binding.detailsLayout.let { detailsBinding ->
+        detailsBinding.titleTv.setTextAndHighlight(
+          res,
+          spanFactory.createBold(),
           R.string.title,
-          title,
-          details.type?.stringRes?.let { resources?.getString(it) }
+          R.string.highlighted_title,
+          details.title,
+          (details.type ?: Type.ANIME).stringRes.let(res::getString)
         )
-      }
-      detailsBinding.beginningTv.text = resources?.getString(
-        R.string.beginning,
-        details.season?.localized(resources),
-        details.seasonYear
-      )
-      details.episodes?.let { episodes ->
-        detailsBinding.episodesTv.text = resources?.getString(R.string.num_episodes, episodes)
-      }
-      details.duration?.let { duration ->
-        (duration / 60).let { hours ->
-          detailsBinding.durationTv.text = if(hours == 0) {
-            resources?.getString(R.string.episode_duration_minutes, duration % 60)
+        details.coverImage?.let(detailsBinding.detailsCoverIv::setUrl)
+        detailsBinding.episodesTv.setTextAndHighlight(
+          res,
+          spanFactory.createBold(),
+          R.string.num_episodes, R.string.highlighted_num_episodes,
+          details.episodes
+        )
+        details.duration?.let { duration ->
+          val hours = duration / 60
+          if (hours == 0) {
+            detailsBinding.durationTv.setTextAndHighlight(
+              res,
+              spanFactory.createBold(),
+              R.string.episode_duration_minutes,
+              R.string.highlighted_episode_duration,
+              duration % 60
+            )
           } else {
-            resources?.getString(R.string.episode_duration_hours, hours, duration % 60)
+            detailsBinding.durationTv.setTextAndHighlight(
+              res,
+              spanFactory.createBold(),
+              R.string.episode_duration_hours,
+              R.string.highlighted_episode_duration,
+              hours,
+              duration % 60
+            )
           }
         }
+        details.description?.let { description ->
+          detailsBinding.descriptionTv.text =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+              Html.fromHtml(details.description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            } else {
+              Html.fromHtml(details.description)
+            }
+        }
       }
-      details.description?.let { description -> detailsBinding.descriptionTv.text = details.description }
     }
   }
 

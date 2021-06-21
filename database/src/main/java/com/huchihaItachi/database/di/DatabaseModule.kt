@@ -17,7 +17,7 @@ interface DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDatabase(context: Context) : AnimeDatabase =
+    fun provideDatabase(context: Context): AnimeDatabase =
       Room.databaseBuilder(context, AnimeDatabase::class.java, BuildConfig.DB_NAME)
         .build()
 

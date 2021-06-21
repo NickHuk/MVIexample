@@ -4,7 +4,6 @@ import com.huchihaitachi.domain.Page
 import com.huchihaitachi.repository.AnimeRepository
 import com.huchihaitachi.usecase.LoadPageUseCase
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
