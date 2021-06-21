@@ -1,11 +1,11 @@
 package com.huchihaitachi.anilist.presentation
 
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.NOT_LOADING
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.VIEW_CONTENT
 import com.huchihaitachi.base.BaseViewState
 import com.huchihaitachi.domain.Anime
 
 data class AnilistViewState(
-  val loading: LoadingType = NOT_LOADING,
+  val loading: LoadingType = VIEW_CONTENT,
   val details: Anime? = null,
   val pageState: PageState? = null,
   val error: String? = null,
@@ -22,6 +22,6 @@ data class AnilistViewState(
   enum class LoadingType {
     PAGE,
     REFRESH,
-    NOT_LOADING
+    VIEW_CONTENT
   }
 }

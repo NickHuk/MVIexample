@@ -4,7 +4,7 @@ import com.apollographql.apollo.exception.ApolloNetworkException
 import com.huchihaitachi.anilist.presentation.AnilistPresenter
 import com.huchihaitachi.anilist.presentation.AnilistView
 import com.huchihaitachi.anilist.presentation.AnilistViewState
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.NOT_LOADING
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.VIEW_CONTENT
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.REFRESH
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
@@ -31,11 +31,7 @@ import io.reactivex.schedulers.TestScheduler
 import io.reactivex.subjects.PublishSubject
 import org.junit.Before
 import org.junit.Test
-import java.util.Collections.addAll
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.HOURS
 import java.util.concurrent.TimeUnit.MILLISECONDS
-import java.util.concurrent.TimeUnit.SECONDS
 
 class AnilistPresenterTest {
   @MockK private lateinit var loadPage: LoadPageUseCase
@@ -164,7 +160,7 @@ class AnilistPresenterTest {
   fun `show details while loading page after error test`() {
     setupTrampoline()
     val initialState = AnilistViewState(
-      loading = NOT_LOADING,
+      loading = VIEW_CONTENT,
       pageState = PageState(anime, 1, true)
     )
     every { getStringResource(R.string.no_connection) } returns "No connection"
@@ -204,7 +200,7 @@ class AnilistPresenterTest {
     loadPageIntentMock.onNext(Unit)
 
     val expectedInitial = AnilistViewState(
-      loading = NOT_LOADING,
+      loading = VIEW_CONTENT,
       pageState = PageState(anime, 1, true)
     )
     //loading
@@ -248,7 +244,7 @@ class AnilistPresenterTest {
   fun `load after backoff`() {
     setupTestScheduler()
     val initialState = AnilistViewState(
-      loading = NOT_LOADING,
+      loading = VIEW_CONTENT,
       pageState = PageState(anime, 1, true)
     )
     every { getStringResource(R.string.no_connection) } returns "No connection"
@@ -287,7 +283,7 @@ class AnilistPresenterTest {
       pageState = PageState(expectedAnime, 2, true),
     )
     val expectedInitial = AnilistViewState(
-      loading = NOT_LOADING,
+      loading = VIEW_CONTENT,
       pageState = PageState(anime, 1, true)
     )
     val expectedSecondState = AnilistViewState(

@@ -3,7 +3,7 @@ package com.huchihaitachi.anilist.presentation
 import com.apollographql.apollo.exception.ApolloNetworkException
 import com.huchihaitachi.anilist.R
 import com.huchihaitachi.anilist.di.scope.AnilistScope
-import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.NOT_LOADING
+import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.VIEW_CONTENT
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.PAGE
 import com.huchihaitachi.anilist.presentation.AnilistViewState.LoadingType.REFRESH
 import com.huchihaitachi.anilist.presentation.AnilistViewState.PageState
@@ -16,7 +16,6 @@ import com.huchihaitachi.usecase.LoadPageUseCase
 import com.huchihaitachi.usecase.RefreshPageUseCase
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.pow
@@ -66,7 +65,7 @@ class AnilistPresenter @Inject constructor(
         }
       //hide details
       val hideDetailsIntent = view.hideDetails
-        .filter { state.loading == NOT_LOADING }
+        .filter { state.loading == VIEW_CONTENT }
         .map { state.copy(details = null) }
       Observable.merge(loadPageIntent, refreshIntent, detailsIntent, hideDetailsIntent)
         .subscribe { s -> state = s }
@@ -79,7 +78,7 @@ class AnilistPresenter @Inject constructor(
       .toObservable()
       .map { page ->
         state.copy(
-          loading = NOT_LOADING,
+          loading = VIEW_CONTENT,
           pageState = PageState(
             mutableListOf<Anime>().apply {
               state.pageState?.anime?.let(::addAll)
@@ -113,14 +112,14 @@ class AnilistPresenter @Inject constructor(
           ) }
           .startWith(
             state.copy(
-              loading = NOT_LOADING,
+              loading = VIEW_CONTENT,
               error = getStringResourceUseCase(R.string.no_connection),
               loadingEnabled = false,
               backoff = state.backoff + 1
             )
           )
       else -> Observable.just(state.copy(
-        loading = NOT_LOADING,
+        loading = VIEW_CONTENT,
         error = throwable.message)
       )
     }
@@ -130,7 +129,7 @@ class AnilistPresenter @Inject constructor(
       .toObservable()
       .map { page ->
         state.copy(
-          loading = NOT_LOADING,
+          loading = VIEW_CONTENT,
           pageState = PageState(page.anime, page.currentPage, page.hasNextPage),
           loadingEnabled = page.hasNextPage ?: true,
           backoff = 0
@@ -139,7 +138,7 @@ class AnilistPresenter @Inject constructor(
       .startWith(state.copy(loading = REFRESH))
       .onErrorReturn { throwable ->
         state.copy(
-          loading = NOT_LOADING,
+          loading = VIEW_CONTENT,
           error = when(throwable) {
             is ApolloNetworkException -> getStringResourceUseCase(R.string.no_connection)
             else -> throwable.message
