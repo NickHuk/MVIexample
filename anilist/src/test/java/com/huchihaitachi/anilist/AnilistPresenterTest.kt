@@ -66,11 +66,14 @@ class AnilistPresenterTest {
     presenter.bind(view)
     presenter.bindIntents()
     val expectedInitial = AnilistViewState(pageState = PageState(null, 0, true))
-    val expectedLoading = AnilistViewState(
+    val expectedLoading = expectedInitial.copy(
       loading = PAGE,
       pageState = PageState(null, 0, true),
     )
-    val expectedResult = AnilistViewState(pageState = PageState(anime, 1, true))
+    val expectedResult = expectedLoading.copy(
+      loading = VIEW_CONTENT,
+      pageState = PageState(anime, 1, true)
+    )
     loadPageIntentMock.onNext(Unit)
     verifyOrder {
       view.render(expectedInitial)
@@ -204,32 +207,18 @@ class AnilistPresenterTest {
       pageState = PageState(anime, 1, true)
     )
     //loading
-    val expectedSecondState = AnilistViewState(
-      loading = PAGE,
-      pageState = PageState(anime, 1, true)
-    )
+    val expectedSecondState = expectedInitial.copy(loading = PAGE)
     //error
-    val expectedThirdState = AnilistViewState(
-      pageState = PageState(anime, 1, true),
+    val expectedThirdState = expectedSecondState.copy(
+      loading = VIEW_CONTENT,
       error = "No connection",
       loadingEnabled = false,
       backoff = 1
     )
     //view details while error
-    val expectedFourthState = AnilistViewState(
-      pageState = PageState(anime, 1, true),
-      details = expectedDetails,
-      error = "No connection",
-      loadingEnabled = false,
-      backoff = 1
-    )
+    val expectedFourthState = expectedThirdState.copy(details = expectedDetails)
     //hide details while error
-    val expectedFifthState = AnilistViewState(
-      pageState = PageState(anime, 1, true),
-      error = "No connection",
-      loadingEnabled = false,
-      backoff = 1
-    )
+    val expectedFifthState = expectedFourthState.copy(details = null)
     verifyOrder {
       view.render(expectedInitial)
       view.render(expectedSecondState)
@@ -322,6 +311,7 @@ class AnilistPresenterTest {
   private fun setupTrampoline() {
     trampoline = Schedulers.trampoline()
     every { rxSchedulers.io } answers { trampoline }
+    every { rxSchedulers.computation } answers { TestScheduler() }
     every { rxSchedulers.ui } answers { trampoline }
   }
 
