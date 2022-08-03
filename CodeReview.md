@@ -41,7 +41,26 @@
 </details>
 
 ## Checklist
-
+- [ ] verify CI checks passed
+- [ ] optional: indicate review in-progress
+- [ ] read ticket
+- [ ] optional: read commits history
+- [ ] optional: go through others’ comments if any
+- [ ] optional: merge branch locally
+- [ ] validate cross-module dependencies <code>build.gradle.kts</code>
+  
+<details>
+  <summary>while reviewing consider the following:</summary>
+  <ul>
+    <li>⬜</li>
+    <li>⬜</li>
+    <li>⬜</li>
+    <li>⬜</li>
+    <li>⬜</li>
+    <li>⬜</li>
+    <li>⬜</li>
+  </ul>
+</details>
 
 <details>
   <summary><h2>Tips</h2></summary>
