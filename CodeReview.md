@@ -1,8 +1,8 @@
 # Code review policy
-## Basics
-## Policy
+## 🍉 Basics
+## 🚓 Policy
 - **Review over codding!** Review PR within "n" hours after its creation. Makes PR owners stay in the context of their work.
-## Reviewing strategies
+## 🗺️ Reviewing strategies
 <details>
   <summary><h3>&nbsp;&nbsp;Per file</h3></summary>
   &nbsp;&nbsp;&nbsp;<b>Overview</b>
@@ -51,7 +51,7 @@
   </ul>
 </details>
 
-## Checklist
+## 🗒️ Checklist
 - [ ] verify CI checks passed
 - [ ] optional: indicate review in-progress
 - [ ] read ticket
@@ -80,7 +80,21 @@
 - [ ] review coupled files and their tests (e.g. presenters, views, interactors)
 
 <details>
-  <summary><h2>Tips</h2></summary>
+  <summary><h2> 💡 Tips</h2></summary>
+  <ul>
+    <li>Remove old local branches <code>git remote prune<remote></code> in order to find the target branch faster locally</li>
+  </ul>
 </details>
 
-## Points for consideration
+## 🤔 Points for consideration
+- [ ] Merge condition
+- [ ] PRs priority (high/medium/low priority). Higher priority PR should be reviewed first.
+- [ ] PR impact (high/medium/low). Low-impact standalone PRs could be merged with less number of reviews.
+- [ ] Prioritize merging PRs over developing new features (potential merge conflicts)
+- [ ] Deadlines for reviewing PR’s - allows decrease a number of re-reviews of every single reviewer. Split review process into iterations:
+    “review” → “addressing comments” → “re-review” →  “addressing comments” 
+    Aim: avoid frequently switching contexts, reduce number of re-reviews
+    PR statuses
+- [ ] Reviews limit (e.g. no more than 3 reviews including code owners)
+- [ ] High-level plan of merging all of the PRs
+- [ ] How to deal with legacy, should we review it?
