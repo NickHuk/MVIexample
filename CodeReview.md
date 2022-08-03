@@ -3,6 +3,30 @@
 ## Policy
 - **Review over codding!** Review PR within "n" hours after its creation. Makes PR owners stay in the context of their work.
 ## Reviewing strategies
-<p align="center"><img src="https://github.com/flutter/website/blob/main/src/assets/images/docs/homepage/reflectly-hero-600px.png?raw=true" alt="Reflectly hero image"></p>
-`Checklist`
+
+<details>
+  <summary><h3>Per file</h3></summary>
+  <b>Overview</b>
+  <b>Advantages</b>
+  <b>Disadvantages</b>
+</details>
+<details>
+  <summary><h3>Per commit</h3></summary>
+  <b>Overview</b>
+  <b>Advantages</b>
+  <b>Disadvantages</b>
+</details>
+<details>
+  <summary><h3>Check out locally</h3></summary>
+  <b>Overview</b>
+  <b>Advantages</b>
+  <b>Disadvantages</b>
+</details>
+
+## Checklist
+
+<details>
+  <summary><h2></h2></summary>
+</details>
+
 ## Points for consideration
