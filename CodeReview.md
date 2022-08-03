@@ -4,6 +4,51 @@
 - **Review over codding!** Review PR within "n" hours after its creation. Makes PR owners stay in the context of their work.
 ## Reviewing strategies
 
+
+
+<details>
+  <summary><h3>Per file</h3></summary>
+  &nbsp;&nbsp;&nbsp;<b>Overview</b>
+  <br>&nbsp;&nbsp;&nbsp;Review a PR file by file. Can be performed in Github UI. Suits small PRs.
+  <br><br>&nbsp;&nbsp;&nbsp;<b>Advantages</b>
+  <ul>
+    <li>Time efficient</li>
+  </ul>
+  &nbsp;&nbsp;&nbsp;<b>Disadvantages</b>
+  <ul>
+    <li>Gives poor task context</li>
+    <li>Risk to miss errors</li>
+  </ul>
+</details>
+<details>
+  <summary><h3></h3></summary>
+  &nbsp;&nbsp;&nbsp;<b>Overview</b>
+  <br>&nbsp;&nbsp;&nbsp;
+  <br><br>&nbsp;&nbsp;&nbsp;<b>Advantages</b>
+  <ul>
+    <li></li>
+  </ul>
+  &nbsp;&nbsp;&nbsp;<b>Disadvantages</b>
+  <ul>
+    <li></li>
+    <li></li>
+  </ul>
+</details>
+<details>
+  <summary><h3></h3></summary>
+  &nbsp;&nbsp;&nbsp;<b>Overview</b>
+  <br>&nbsp;&nbsp;&nbsp;
+  <br><br>&nbsp;&nbsp;&nbsp;<b>Advantages</b>
+  <ul>
+    <li></li>
+  </ul>
+  &nbsp;&nbsp;&nbsp;<b>Disadvantages</b>
+  <ul>
+    <li></li>
+    <li></li>
+  </ul>
+</details>
+
 <details>
   <summary><h3>Per file</h3></summary>
   <b>Overview</b>
